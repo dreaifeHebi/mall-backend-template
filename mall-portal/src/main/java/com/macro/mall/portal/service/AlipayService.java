@@ -6,10 +6,10 @@ import com.macro.mall.portal.domain.AliPayParam;
 import java.util.Map;
 
 /**
- * @auther macrozheng
+ * @auther dreaifekks
  * @description 支付宝支付Service
- * @date 2023/9/8
- * @github https://github.com/macrozheng
+ * @date 2026/6/30
+ * @github https://github.com/dreaifekks
  */
 public interface AlipayService {
     /**

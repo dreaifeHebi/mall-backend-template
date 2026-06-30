@@ -2,6 +2,8 @@
 
 Lightweight Spring Boot mall backend template.
 
+Fork from [mall](https://github.com/macrozheng/mall)
+
 ## Core Modules
 
 ```text

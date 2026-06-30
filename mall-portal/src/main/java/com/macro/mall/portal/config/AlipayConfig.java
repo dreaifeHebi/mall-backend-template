@@ -6,10 +6,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 /**
- * @auther macrozheng
+ * @auther dreaifekks
  * @description 支付宝支付相关配置
- * @date 2023/9/8
- * @github https://github.com/macrozheng
+ * @date 2026/6/30
+ * @github https://github.com/dreaifekks
  */
 @Getter
 @Setter

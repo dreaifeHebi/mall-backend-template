@@ -6,10 +6,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * @auther macrozheng
+ * @auther dreaifekks
  * @description 支付宝请求客户端配置
- * @date 2023/9/8
- * @github https://github.com/macrozheng
+ * @date 2026/6/30
+ * @github https://github.com/dreaifekks
  */
 @Configuration
 public class AlipayClientConfig {
