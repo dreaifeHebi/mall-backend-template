@@ -1,0 +1,29 @@
+# 定时任务batch相关配置
+# 添加到现有的application.yml文件中
+
+# 订单超时配置
+order:
+  timeout:
+    minutes: 1440  # 订单超时时间（分钟，24小时）
+
+# 数据统计相关配置  
+statistics:
+  report:
+    path: ./reports/daily  # 使用相对路径，适合开发环境
+  archive:
+    path: ./reports/archive
+  retention:
+    days: 365
+
+# 定时任务开关配置
+batch:
+  order-processing:
+    enabled: true
+  data-statistics:
+    enabled: true
+
+# 通知配置
+notification:
+  email:
+    order-cancellation: true
+    order-status-change: true

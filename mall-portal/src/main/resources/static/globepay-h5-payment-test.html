@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GlobePay H5支付测试</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .payment-methods {
+            margin: 20px 0;
+        }
+
+        .payment-method {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin: 10px 0;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .payment-method:hover {
+            border-color: #667eea;
+            background-color: #f8f9ff;
+        }
+
+        .payment-method.selected {
+            border-color: #667eea;
+            background-color: #f0f4ff;
+        }
+
+        .payment-method input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .payment-icon {
+            width: 40px;
+            height: 40px;
+            margin-right: 15px;
+            border-radius: 5px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .alipay-icon {
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiByeD0iNSIgZmlsbD0iIzAwOUZEQiIvPgo8dGV4dCB4PSI1IiB5PSIyNSIgZmlsbD0id2hpdGUiIGZvbnQtc2l6ZT0iMTIiPuaUr+S7mOWunzwvdGV4dD4KPC9zdmc+');
+        }
+
+        .wechat-icon {
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiByeD0iNSIgZmlsbD0iIzA5QkI3RiIvPgo8dGV4dCB4PSI1IiB5PSIyNSIgZmlsbD0id2hpdGUiIGZvbnQtc2l6ZT0iMTIiPuW+ruS/oeaUr+S7mDwvdGV4dD4KPC9zdmc+');
+        }
+
+        .credit-icon {
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiByeD0iNSIgZmlsbD0iI0ZGNjkwMCIvPgo8dGV4dCB4PSI1IiB5PSIyNSIgZmlsbD0id2hpdGUiIGZvbnQtc2l6ZT0iMTAiPuS/oeeFqOWNoTwvdGV4dD4KPC9zdmc+');
+        }
+
+        .form-group {
+            margin: 15px 0;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .pay-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            margin-top: 20px;
+        }
+
+        .pay-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .pay-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.pending {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>GlobePay H5支付测试</h1>
+            <p>选择支付方式进行测试</p>
+        </div>
+        
+        <div class="content">
+            <div class="form-group">
+                <label for="orderSn">订单号:</label>
+                <input type="text" id="orderSn" value="" placeholder="自动生成订单号">
+            </div>
+            
+            <div class="form-group">
+                <label for="amount">支付金额 (JPY):</label>
+                <input type="number" id="amount" value="100" min="1">
+            </div>
+            
+            <div class="form-group">
+                <label for="currency">货币类型:</label>
+                <select id="currency" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px;">
+                    <option value="JPY">日元 (JPY)</option>
+                    <option value="CNY">人民币 (CNY)</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="subject">商品描述:</label>
+                <input type="text" id="subject" value="日货商城测试订单" placeholder="商品描述">
+            </div>
+
+            <div class="payment-methods">
+                <div class="payment-method" onclick="selectPaymentMethod('ALIPAY_H5')">
+                    <input type="radio" name="paymentMethod" value="ALIPAY_H5">
+                    <div class="payment-icon alipay-icon"></div>
+                    <div>
+                        <div><strong>支付宝H5支付</strong></div>
+                        <div style="font-size: 12px; color: #666;">通过GlobePay支付宝渠道</div>
+                    </div>
+                </div>
+                
+                <div class="payment-method" onclick="selectPaymentMethod('WECHAT_H5')">
+                    <input type="radio" name="paymentMethod" value="WECHAT_H5">
+                    <div class="payment-icon wechat-icon"></div>
+                    <div>
+                        <div><strong>微信H5支付</strong></div>
+                        <div style="font-size: 12px; color: #666;">通过GlobePay微信渠道</div>
+                    </div>
+                </div>
+                
+                <div class="payment-method" onclick="selectPaymentMethod('CREDIT_CARD')">
+                    <input type="radio" name="paymentMethod" value="CREDIT_CARD">
+                    <div class="payment-icon credit-icon"></div>
+                    <div>
+                        <div><strong>信用卡支付</strong></div>
+                        <div style="font-size: 12px; color: #666;">支持Visa、MasterCard、JCB等</div>
+                        <div style="font-size: 11px; color: #999;">安全3DS2.0验证</div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="pay-button" onclick="confirmPayment()">确认支付</button>
+            
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>正在处理支付请求...</p>
+            </div>
+            
+            <div id="status"></div>
+        </div>
+    </div>
+
+    <script>
+        let selectedPaymentMethod = '';
+        let currentOrderSn = '';
+
+        // 生成订单号
+        function generateOrderSn() {
+            const now = new Date();
+            const timestamp = now.getTime();
+            const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+            return 'GP' + timestamp + random;
+        }
+
+        // 页面加载时生成订单号
+        window.onload = function() {
+            document.getElementById('orderSn').value = generateOrderSn();
+        };
+
+        // 选择支付方式
+        function selectPaymentMethod(method) {
+            selectedPaymentMethod = method;
+            
+            // 移除所有选中状态
+            document.querySelectorAll('.payment-method').forEach(el => {
+                el.classList.remove('selected');
+            });
+            
+            // 添加选中状态
+            event.currentTarget.classList.add('selected');
+            
+            // 选中对应的radio
+            document.querySelector(`input[value="${method}"]`).checked = true;
+        }
+
+        // 确认支付
+        async function confirmPayment() {
+            if (!selectedPaymentMethod) {
+                showStatus('请选择支付方式', 'error');
+                return;
+            }
+
+            const orderSn = document.getElementById('orderSn').value;
+            const amount = document.getElementById('amount').value;
+            const currency = document.getElementById('currency').value;
+            const subject = document.getElementById('subject').value;
+
+            if (!orderSn || !amount || !subject) {
+                showStatus('请填写完整信息', 'error');
+                return;
+            }
+
+            currentOrderSn = orderSn;
+            
+            const paymentData = {
+                orderId: Math.floor(Math.random() * 1000000),
+                orderSn: orderSn,
+                paymentChannel: selectedPaymentMethod,
+                totalAmount: parseFloat(amount),
+                currency: currency,
+                subject: subject,
+                returnUrl: window.location.origin + '/portal/payment/success.html',
+                notifyUrl: window.location.origin + '/portal/payment/h5/notify/globepay'
+            };
+
+            console.log('发送支付请求:', paymentData);
+            
+            // 显示加载状态
+            showLoading(true);
+            
+            try {
+                const response = await fetch('/portal/payment/h5/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(paymentData)
+                });
+
+                const result = await response.json();
+                console.log('支付响应:', result);
+
+                showLoading(false);
+
+                if (result.code === 200 && result.data) {
+                    showStatus('支付订单创建成功！正在跳转...', 'success');
+                    
+                    // 跳转到支付页面
+                    setTimeout(() => {
+                        if (result.data.paymentUrl) {
+                            window.location.href = result.data.paymentUrl;
+                        } else {
+                            showStatus('未获取到支付链接', 'error');
+                        }
+                    }, 1000);
+                    
+                    // 开始轮询支付状态
+                    setTimeout(() => {
+                        pollPaymentStatus();
+                    }, 3000);
+                } else {
+                    showStatus(`支付订单创建失败: ${result.message || '未知错误'}`, 'error');
+                }
+            } catch (error) {
+                showLoading(false);
+                console.error('支付请求失败:', error);
+                showStatus(`网络错误: ${error.message}`, 'error');
+            }
+        }
+
+        // 轮询支付状态
+        async function pollPaymentStatus() {
+            if (!currentOrderSn || !selectedPaymentMethod) return;
+            
+            try {
+                const response = await fetch(`/portal/payment/h5/status/${currentOrderSn}/${selectedPaymentMethod}`);
+                const result = await response.json();
+                
+                console.log('支付状态查询结果:', result);
+                
+                if (result.code === 200 && result.data) {
+                    const status = result.data.paymentStatus;
+                    
+                    if (status === 'SUCCESS') {
+                        showStatus(`支付成功！订单号: ${currentOrderSn}`, 'success');
+                        return;
+                    } else if (status === 'FAILED') {
+                        showStatus(`支付失败！原因: ${result.data.failureReason || '未知'}`, 'error');
+                        return;
+                    } else if (status === 'CANCELLED') {
+                        showStatus('支付已取消', 'error');
+                        return;
+                    }
+                }
+                
+                // 继续轮询
+                setTimeout(pollPaymentStatus, 3000);
+                
+            } catch (error) {
+                console.error('查询支付状态失败:', error);
+                setTimeout(pollPaymentStatus, 5000);
+            }
+        }
+
+        // 显示状态
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = message;
+            statusDiv.className = `status ${type}`;
+            statusDiv.style.display = 'block';
+        }
+
+        // 显示/隐藏加载状态
+        function showLoading(show) {
+            const loadingDiv = document.querySelector('.loading');
+            const payButton = document.querySelector('.pay-button');
+            
+            if (show) {
+                loadingDiv.style.display = 'block';
+                payButton.disabled = true;
+            } else {
+                loadingDiv.style.display = 'none';
+                payButton.disabled = false;
+            }
+        }
+
+        // 添加回车键监听
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                confirmPayment();
+            }
+        });
+    </script>
+</body>
+</html>

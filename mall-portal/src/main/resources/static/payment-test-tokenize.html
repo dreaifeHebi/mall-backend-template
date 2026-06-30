@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>信用卡支付测试 - Tokenize模式</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            line-height: 1.6;
+        }
+        .step { 
+            border: 1px solid #ddd; 
+            padding: 20px; 
+            margin: 10px 0; 
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .step h3 { 
+            color: #333; 
+            margin-top: 0; 
+        }
+        button { 
+            background-color: #007bff; 
+            color: white; 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+        button:disabled { 
+            background-color: #6c757d; 
+            cursor: not-allowed; 
+        }
+        input { 
+            padding: 8px; 
+            margin: 5px; 
+            border: 1px solid #ddd; 
+            border-radius: 4px; 
+            width: 200px;
+        }
+        .result { 
+            margin: 10px 0; 
+            padding: 10px; 
+            border-radius: 4px; 
+            min-height: 20px;
+        }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .warning { background-color: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        pre { 
+            background-color: #f8f9fa; 
+            padding: 10px; 
+            border-radius: 4px; 
+            overflow-x: auto; 
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🏦 信用卡支付测试 - Tokenize模式</h1>
+    <p><strong>新的信用卡支付流程采用tokenize模式，分为3个步骤：</strong></p>
+    
+    <!-- 步骤1: 创建绑卡 -->
+    <div class="step">
+        <h3>步骤1: 创建绑卡请求</h3>
+        <p>首先创建绑卡请求，获取绑卡URL让用户输入信用卡信息</p>
+        
+        <div>
+            <label>订单号: </label>
+            <input type="text" id="orderId1" placeholder="自动生成" readonly>
+            <button onclick="generateOrderId()">生成新订单号</button>
+        </div>
+        
+        <div>
+            <label>订单描述: </label>
+            <input type="text" id="description1" value="日货商城信用卡支付测试">
+        </div>
+        
+        <div>
+            <label>金额(日元): </label>
+            <input type="number" id="amount1" value="100" min="1">
+        </div>
+        
+        <button onclick="createBindCard()">创建绑卡请求</button>
+        
+        <div id="step1Result" class="result"></div>
+    </div>
+    
+    <!-- 步骤2: 查询绑卡结果 -->
+    <div class="step">
+        <h3>步骤2: 查询绑卡结果</h3>
+        <p>用户完成绑卡后，查询绑卡结果获取member_token</p>
+        
+        <div>
+            <label>绑卡请求ID: </label>
+            <input type="text" id="requestId2" placeholder="来自步骤1的订单号">
+            <button onclick="copyOrderId()">复制订单号</button>
+        </div>
+        
+        <button onclick="queryBindResult()" id="queryBtn" disabled>查询绑卡结果</button>
+        
+        <div id="step2Result" class="result"></div>
+    </div>
+    
+    <!-- 步骤3: 使用Token支付 -->
+    <div class="step">
+        <h3>步骤3: 使用Member Token创建支付</h3>
+        <p>使用获得的member_token直接完成支付</p>
+        
+        <div>
+            <label>支付订单号: </label>
+            <input type="text" id="payOrderId" placeholder="自动生成" readonly>
+            <button onclick="generatePayOrderId()">生成支付订单号</button>
+        </div>
+        
+        <div>
+            <label>Member Token: </label>
+            <input type="text" id="memberToken" placeholder="来自步骤2">
+        </div>
+        
+        <div>
+            <label>支付描述: </label>
+            <input type="text" id="payDescription" value="日货商城信用卡Token支付">
+        </div>
+        
+        <div>
+            <label>支付金额(日元): </label>
+            <input type="number" id="payAmount" value="100" min="1">
+        </div>
+        
+        <button onclick="createTokenPayment()" id="payBtn" disabled>创建Token支付</button>
+        
+        <div id="step3Result" class="result"></div>
+    </div>
+
+    <script>
+        let currentOrderId = '';
+        let currentMemberToken = '';
+        
+        // 生成订单号
+        function generateOrderId() {
+            const timestamp = Date.now();
+            currentOrderId = 'GP' + timestamp;
+            document.getElementById('orderId1').value = currentOrderId;
+            document.getElementById('requestId2').value = currentOrderId;
+            document.getElementById('queryBtn').disabled = false;
+        }
+        
+        function generatePayOrderId() {
+            const payOrderId = 'PAY' + Date.now();
+            document.getElementById('payOrderId').value = payOrderId;
+        }
+        
+        function copyOrderId() {
+            document.getElementById('requestId2').value = document.getElementById('orderId1').value;
+        }
+        
+        // 初始化
+        generateOrderId();
+        generatePayOrderId();
+        
+        // 步骤1: 创建绑卡
+        async function createBindCard() {
+            const orderIdStr = document.getElementById('orderId1').value;
+            const description = document.getElementById('description1').value;
+            const amount = parseInt(document.getElementById('amount1').value);
+            
+            // 从GP前缀的字符串中提取数字部分作为orderId
+            const orderIdNumber = parseInt(orderIdStr.replace('GP', ''));
+            
+            const payload = {
+                orderId: orderIdNumber,  // 传递数字类型
+                orderSn: orderIdStr,     // 传递字符串类型
+                totalAmount: amount,
+                paymentChannel: 'CREDIT_CARD',
+                subject: description
+            };
+            
+            console.log('发送的请求数据:', payload);
+            
+            try {
+                showResult('step1Result', '正在创建绑卡请求...', 'info');
+                
+                const response = await fetch('/portal/payment/globePay/creditCard', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                // 首先检查HTTP状态码
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    showResult('step1Result', `❌ HTTP错误: ${response.status} ${response.statusText}\\n响应内容: ${errorText}`, 'error');
+                    return;
+                }
+                
+                // 获取响应文本
+                const responseText = await response.text();
+                console.log('原始响应:', responseText);
+                
+                // 尝试解析JSON
+                let result;
+                try {
+                    result = JSON.parse(responseText);
+                } catch (parseError) {
+                    showResult('step1Result', `❌ JSON解析失败: ${parseError.message}\\n原始响应: ${responseText}`, 'error');
+                    return;
+                }
+                
+                if (result.code === 200 && result.data && result.data.return_code === 'SUCCESS') {
+                    const data = result.data;
+                    showResult('step1Result', 
+                        `✅ 绑卡请求创建成功！\\n绑卡URL: ${data.pay_url}\\n\\n🔗 请点击下方链接完成信用卡绑定：\\n<a href="${data.pay_url}" target="_blank" style="color: #007bff;">打开绑卡页面</a>`, 
+                        'success');
+                    document.getElementById('queryBtn').disabled = false;
+                } else {
+                    const errorMsg = result.data ? (result.data.return_msg || result.data.returnMsg) : result.message;
+                    showResult('step1Result', `❌ 绑卡请求失败: ${errorMsg || '未知错误'}`, 'error');
+                }
+                
+                showResult('step1Result', 
+                    document.getElementById('step1Result').innerHTML + 
+                    '\\n\\n📋 完整响应:\\n' + JSON.stringify(result, null, 2), 
+                    document.getElementById('step1Result').className.includes('success') ? 'success' : 'error');
+                    
+            } catch (error) {
+                console.error('请求异常:', error);
+                showResult('step1Result', `❌ 网络请求失败: ${error.message}`, 'error');
+            }
+        }
+        
+        // 步骤2: 查询绑卡结果
+        async function queryBindResult() {
+            const requestId = document.getElementById('requestId2').value;
+            
+            try {
+                showResult('step2Result', '正在查询绑卡结果...', 'info');
+                
+                const response = await fetch(`/portal/payment/globePay/queryBindCard/${requestId}`, {
+                    method: 'GET'
+                });
+                
+                const result = await response.json();
+                
+                if (result.code === 200 && result.data && result.data.return_code === 'SUCCESS' && result.data.result_code === 'SUCCESS') {
+                    // 从payUrl中提取member_token
+                    const data = result.data;
+                    const tokenMatch = data.pay_url && data.pay_url.match(/member_token:(.+)/);
+                    if (tokenMatch) {
+                        currentMemberToken = tokenMatch[1];
+                        document.getElementById('memberToken').value = currentMemberToken;
+                        document.getElementById('payBtn').disabled = false;
+                        
+                        showResult('step2Result', 
+                            `✅ 绑卡成功！\\nMember Token: ${currentMemberToken}\\n\\n💳 现在可以使用此Token进行支付`, 
+                            'success');
+                    } else {
+                        showResult('step2Result', `⚠️ 响应成功但未找到Token: ${data.return_msg}`, 'warning');
+                    }
+                } else if (result.data && result.data.result_code === 'NO_BIND') {
+                    showResult('step2Result', '⏳ 用户尚未完成绑卡，请完成绑卡后再查询', 'warning');
+                } else {
+                    const errorMsg = result.data ? (result.data.return_msg || result.data.returnMsg) : result.message;
+                    showResult('step2Result', `❌ 查询失败: ${errorMsg}`, 'error');
+                }
+                
+                showResult('step2Result', 
+                    document.getElementById('step2Result').innerHTML + 
+                    '\\n\\n📋 原始响应:\\n' + JSON.stringify(result, null, 2), 
+                    document.getElementById('step2Result').className.includes('success') ? 'success' : 
+                    document.getElementById('step2Result').className.includes('warning') ? 'warning' : 'error');
+                    
+            } catch (error) {
+                showResult('step2Result', `❌ 请求失败: ${error.message}`, 'error');
+            }
+        }
+        
+        // 步骤3: 创建Token支付
+        async function createTokenPayment() {
+            const orderIdStr = document.getElementById('payOrderId').value;
+            const memberToken = document.getElementById('memberToken').value;
+            const description = document.getElementById('payDescription').value;
+            const amount = parseInt(document.getElementById('payAmount').value);
+            
+            if (!memberToken) {
+                showResult('step3Result', '❌ 请先获取Member Token', 'error');
+                return;
+            }
+            
+            // 从PAY前缀的字符串中提取数字部分作为orderId
+            const orderIdNumber = parseInt(orderIdStr.replace('PAY', ''));
+            
+            try {
+                showResult('step3Result', '正在创建Token支付...', 'info');
+                
+                                const response = await fetch(`/portal/payment/globePay/tokenPay/${orderIdStr}/${memberToken}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        orderId: orderIdNumber,  // 传递数字类型
+                        orderSn: orderIdStr,     // 传递字符串类型
+                        totalAmount: amount,
+                        paymentChannel: 'CREDIT_CARD',
+                        subject: description
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.code === 200 && result.data && result.data.return_code === 'SUCCESS') {
+                    const data = result.data;
+                    showResult('step3Result', 
+                        `✅ Token支付创建成功！\\n订单ID: ${data.order_id || orderIdStr}\\n商户订单ID: ${data.partner_order_id || data.partnerOrderId}\\n\\n🎉 信用卡支付流程完成！`, 
+                        'success');
+                } else {
+                    const errorMsg = result.data ? (result.data.return_msg || result.data.returnMsg) : result.message;
+                    showResult('step3Result', `❌ Token支付失败: ${errorMsg}`, 'error');
+                }
+                
+                showResult('step3Result', 
+                    document.getElementById('step3Result').innerHTML + 
+                    '\\n\\n📋 原始响应:\\n' + JSON.stringify(result, null, 2), 
+                    document.getElementById('step3Result').className.includes('success') ? 'success' : 'error');
+                    
+            } catch (error) {
+                showResult('step3Result', `❌ 请求失败: ${error.message}`, 'error');
+            }
+        }
+        
+        function showResult(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = '<pre>' + message + '</pre>';
+            element.className = 'result ' + type;
+        }
+    </script>
+</body>
+</html>

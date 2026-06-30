@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.macro.mall.dao.refund.RefundRequestDao">
+    
+    <resultMap id="BaseResultMap" type="com.macro.mall.domain.refund.RefundRequest">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="refund_sn" property="refundSn" jdbcType="VARCHAR"/>
+        <result column="order_id" property="orderId" jdbcType="BIGINT"/>
+        <result column="order_sn" property="orderSn" jdbcType="VARCHAR"/>
+        <result column="member_id" property="memberId" jdbcType="BIGINT"/>
+        <result column="member_username" property="memberUsername" jdbcType="VARCHAR"/>
+        <result column="payment_id" property="paymentId" jdbcType="VARCHAR"/>
+        <result column="payment_platform" property="paymentPlatform" jdbcType="VARCHAR"/>
+        <result column="payment_channel" property="paymentChannel" jdbcType="VARCHAR"/>
+        <result column="refund_amount" property="refundAmount" jdbcType="DECIMAL"/>
+        <result column="reason" property="reason" jdbcType="VARCHAR"/>
+        <result column="description" property="description" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="VARCHAR"/>
+        <result column="operator_id" property="operatorId" jdbcType="BIGINT"/>
+        <result column="operator_name" property="operatorName" jdbcType="VARCHAR"/>
+        <result column="operation_type" property="operationType" jdbcType="VARCHAR"/>
+        <result column="process_count" property="processCount" jdbcType="INTEGER"/>
+        <result column="failure_reason" property="failureReason" jdbcType="VARCHAR"/>
+        <result column="created_time" property="createdTime" jdbcType="TIMESTAMP"/>
+        <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP"/>
+        <result column="last_process_time" property="lastProcessTime" jdbcType="TIMESTAMP"/>
+        <result column="note" property="note" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, refund_sn, order_id, order_sn, member_id, member_username, payment_id, 
+        payment_platform, payment_channel, refund_amount, reason, description, status, 
+        operator_id, operator_name, operation_type, process_count, failure_reason, 
+        created_time, updated_time, last_process_time, note
+    </sql>
+
+    <!-- 基础查询 -->
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from oms_refund_request
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectByRefundSn" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from oms_refund_request
+        where refund_sn = #{refundSn,jdbcType=VARCHAR}
+    </select>
+
+    <!-- 插入 -->
+    <insert id="insert" parameterType="com.macro.mall.domain.refund.RefundRequest" useGeneratedKeys="true" keyProperty="id">
+        insert into oms_refund_request (
+            refund_sn, order_id, order_sn, member_id, member_username, payment_id,
+            payment_platform, payment_channel, refund_amount, reason, description, status,
+            operator_id, operator_name, operation_type, process_count, failure_reason,
+            created_time, updated_time, last_process_time, note
+        )
+        values (
+            #{refundSn,jdbcType=VARCHAR}, #{orderId,jdbcType=BIGINT}, #{orderSn,jdbcType=VARCHAR},
+            #{memberId,jdbcType=BIGINT}, #{memberUsername,jdbcType=VARCHAR}, #{paymentId,jdbcType=VARCHAR},
+            #{paymentPlatform,jdbcType=VARCHAR}, #{paymentChannel,jdbcType=VARCHAR},
+            #{refundAmount,jdbcType=DECIMAL}, #{reason,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR},
+            #{status,jdbcType=VARCHAR}, #{operatorId,jdbcType=BIGINT}, #{operatorName,jdbcType=VARCHAR},
+            #{operationType,jdbcType=VARCHAR}, #{processCount,jdbcType=INTEGER}, #{failureReason,jdbcType=VARCHAR},
+            #{createdTime,jdbcType=TIMESTAMP}, #{updatedTime,jdbcType=TIMESTAMP},
+            #{lastProcessTime,jdbcType=TIMESTAMP}, #{note,jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <!-- 更新 -->
+    <update id="updateByPrimaryKey" parameterType="com.macro.mall.domain.refund.RefundRequest">
+        update oms_refund_request
+        set refund_sn = #{refundSn,jdbcType=VARCHAR},
+            order_id = #{orderId,jdbcType=BIGINT},
+            order_sn = #{orderSn,jdbcType=VARCHAR},
+            member_id = #{memberId,jdbcType=BIGINT},
+            member_username = #{memberUsername,jdbcType=VARCHAR},
+            payment_id = #{paymentId,jdbcType=VARCHAR},
+            payment_platform = #{paymentPlatform,jdbcType=VARCHAR},
+            payment_channel = #{paymentChannel,jdbcType=VARCHAR},    
+            refund_amount = #{refundAmount,jdbcType=DECIMAL},
+            reason = #{reason,jdbcType=VARCHAR},
+            description = #{description,jdbcType=VARCHAR},
+            status = #{status,jdbcType=VARCHAR},
+            operator_id = #{operatorId,jdbcType=BIGINT},
+            operator_name = #{operatorName,jdbcType=VARCHAR},
+            operation_type = #{operationType,jdbcType=VARCHAR},
+            process_count = #{processCount,jdbcType=INTEGER},
+            failure_reason = #{failureReason,jdbcType=VARCHAR},
+            updated_time = #{updatedTime,jdbcType=TIMESTAMP},
+            last_process_time = #{lastProcessTime,jdbcType=TIMESTAMP},
+            note = #{note,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <!-- 状态更新 -->
+    <update id="updateStatus" parameterType="map">
+        update oms_refund_request
+        set status = #{status,jdbcType=VARCHAR},
+            updated_time = #{updatedTime,jdbcType=TIMESTAMP}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <update id="updateStatusByRefundSn" parameterType="map">
+        update oms_refund_request
+        set status = #{status,jdbcType=VARCHAR},
+            updated_time = #{updatedTime,jdbcType=TIMESTAMP}
+        where refund_sn = #{refundSn,jdbcType=VARCHAR}
+    </update>
+
+    <!-- 批量状态更新 -->
+    <update id="batchUpdateStatus" parameterType="map">
+        update oms_refund_request
+        set status = #{status,jdbcType=VARCHAR},
+            updated_time = #{updatedTime,jdbcType=TIMESTAMP}
+        where id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!-- 处理计数更新 -->
+    <update id="updateProcessCount" parameterType="map">
+        update oms_refund_request
+        set process_count = #{processCount,jdbcType=INTEGER},
+            failure_reason = #{failureReason,jdbcType=VARCHAR},
+            last_process_time = #{lastProcessTime,jdbcType=TIMESTAMP},
+            updated_time = #{updatedTime,jdbcType=TIMESTAMP}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <!-- 删除 -->
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from oms_refund_request
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+
+    <!-- 条件查询 -->
+    <select id="selectByCondition" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from oms_refund_request
+        <where>
+            <if test="status != null and status != ''">
+                and status = #{status,jdbcType=VARCHAR}
+            </if>
+            <if test="startDate != null">
+                and created_time &gt;= #{startDate,jdbcType=TIMESTAMP}
+            </if>
+            <if test="endDate != null">
+                and created_time &lt;= #{endDate,jdbcType=TIMESTAMP}
+            </if>
+            <if test="memberUsername != null and memberUsername != ''">
+                and member_username like concat('%', #{memberUsername,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="orderSn != null and orderSn != ''">
+                and order_sn = #{orderSn,jdbcType=VARCHAR}
+            </if>
+            <if test="refundSn != null and refundSn != ''">
+                and refund_sn = #{refundSn,jdbcType=VARCHAR}
+            </if>
+            <if test="paymentPlatform != null and paymentPlatform != ''">
+                and payment_platform = #{paymentPlatform,jdbcType=VARCHAR}
+            </if>
+            <if test="paymentChannel != null and paymentChannel != ''">
+                and payment_channel = #{paymentChannel,jdbcType=VARCHAR}
+            </if>
+        </where>
+        order by created_time desc
+    </select>
+
+    <!-- 按订单查询 -->
+    <select id="selectByOrderId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from oms_refund_request
+        where order_id = #{orderId,jdbcType=BIGINT}
+        order by created_time desc
+    </select>
+
+    <select id="selectByOrderSn" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from oms_refund_request
+        where order_sn = #{orderSn,jdbcType=VARCHAR}
+        order by created_time desc
+    </select>
+
+    <!-- 按会员查询 -->
+    <select id="selectByMemberId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from oms_refund_request
+        where member_id = #{memberId,jdbcType=BIGINT}
+        order by created_time desc
+    </select>
+
+    <!-- 按状态查询 -->
+    <select id="selectByStatus" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from oms_refund_request
+        where status = #{status,jdbcType=VARCHAR}
+        order by created_time desc
+    </select>
+
+    <select id="selectByStatusList" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from oms_refund_request
+        where status in
+        <foreach collection="statusList" item="status" open="(" separator="," close=")">
+            #{status}
+        </foreach>
+        order by created_time desc
+    </select>
+
+    <!-- 待处理查询 -->
+    <select id="selectPendingRefunds" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from oms_refund_request
+        where status in ('PROCESSING', 'PENDING')
+        order by created_time asc
+    </select>
+
+    <!-- 超时查询 -->
+    <select id="selectTimeoutRefunds" parameterType="java.util.Date" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from oms_refund_request
+        where status in ('PROCESSING', 'PENDING')
+        and (last_process_time is null or last_process_time &lt; #{timeoutDate,jdbcType=TIMESTAMP})
+        and process_count &lt; 5
+        order by created_time asc
+    </select>
+
+    <!-- 统计查询 -->
+    <select id="countByStatus" parameterType="java.lang.String" resultType="java.lang.Long">
+        select count(*)
+        from oms_refund_request
+        where status = #{status,jdbcType=VARCHAR}
+    </select>
+
+    <select id="countByCondition" parameterType="map" resultType="java.lang.Long">
+        select count(*)
+        from oms_refund_request
+        <where>
+            <if test="status != null and status != ''">
+                and status = #{status,jdbcType=VARCHAR}
+            </if>
+            <if test="startDate != null">
+                and created_time &gt;= #{startDate,jdbcType=TIMESTAMP}
+            </if>
+            <if test="endDate != null">
+                and created_time &lt;= #{endDate,jdbcType=TIMESTAMP}
+            </if>
+            <if test="memberUsername != null and memberUsername != ''">
+                and member_username like concat('%', #{memberUsername,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="orderSn != null and orderSn != ''">
+                and order_sn = #{orderSn,jdbcType=VARCHAR}
+            </if>
+            <if test="refundSn != null and refundSn != ''">
+                and refund_sn = #{refundSn,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+
+    <select id="sumAmountByStatus" parameterType="java.lang.String" resultType="java.math.BigDecimal">
+        select COALESCE(sum(refund_amount), 0)
+        from oms_refund_request
+        where status = #{status,jdbcType=VARCHAR}
+    </select>
+
+    <select id="countByStatusAndDateRange" parameterType="map" resultType="java.lang.Long">
+        select count(*)
+        from oms_refund_request
+        where status = #{status,jdbcType=VARCHAR}
+        <if test="startDate != null">
+            and created_time &gt;= #{startDate,jdbcType=TIMESTAMP}
+        </if>
+        <if test="endDate != null">
+            and created_time &lt;= #{endDate,jdbcType=TIMESTAMP}
+        </if>
+    </select>
+
+    <select id="sumAmountByStatusAndDateRange" parameterType="map" resultType="java.math.BigDecimal">
+        select COALESCE(sum(refund_amount), 0)
+        from oms_refund_request
+        where status = #{status,jdbcType=VARCHAR}
+        <if test="startDate != null">
+            and created_time &gt;= #{startDate,jdbcType=TIMESTAMP}
+        </if>
+        <if test="endDate != null">
+            and created_time &lt;= #{endDate,jdbcType=TIMESTAMP}
+        </if>
+    </select>
+
+    <!-- 按支付平台统计 -->
+    <select id="countByPaymentPlatform" parameterType="java.lang.String" resultType="java.lang.Long">
+        select count(*)
+        from oms_refund_request
+        where payment_platform = #{paymentPlatform,jdbcType=VARCHAR}
+    </select>
+
+    <select id="sumAmountByPaymentPlatform" parameterType="java.lang.String" resultType="java.math.BigDecimal">
+        select COALESCE(sum(refund_amount), 0)
+        from oms_refund_request
+        where payment_platform = #{paymentPlatform,jdbcType=VARCHAR}
+    </select>
+
+    <!-- 批量插入 -->
+    <insert id="batchInsert" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+        insert into oms_refund_request (
+            refund_sn, order_id, order_sn, member_id, member_username, payment_id,
+            payment_platform, payment_channel, refund_amount, reason, description, status,
+            operator_id, operator_name, operation_type, process_count, failure_reason,
+            created_time, updated_time, last_process_time, note
+        )
+        values
+        <foreach collection="list" item="item" separator=",">
+            (
+                #{item.refundSn,jdbcType=VARCHAR}, #{item.orderId,jdbcType=BIGINT}, #{item.orderSn,jdbcType=VARCHAR},
+                #{item.memberId,jdbcType=BIGINT}, #{item.memberUsername,jdbcType=VARCHAR}, #{item.paymentId,jdbcType=VARCHAR},
+                #{item.paymentPlatform,jdbcType=VARCHAR}, #{item.paymentChannel,jdbcType=VARCHAR},
+                #{item.refundAmount,jdbcType=DECIMAL}, #{item.reason,jdbcType=VARCHAR}, #{item.description,jdbcType=VARCHAR},
+                #{item.status,jdbcType=VARCHAR}, #{item.operatorId,jdbcType=BIGINT}, #{item.operatorName,jdbcType=VARCHAR},
+                #{item.operationType,jdbcType=VARCHAR}, #{item.processCount,jdbcType=INTEGER}, #{item.failureReason,jdbcType=VARCHAR},
+                #{item.createdTime,jdbcType=TIMESTAMP}, #{item.updatedTime,jdbcType=TIMESTAMP},
+                #{item.lastProcessTime,jdbcType=TIMESTAMP}, #{item.note,jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+</mapper>

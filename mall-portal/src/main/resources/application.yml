@@ -1,0 +1,139 @@
+spring:
+  application:
+    name: mall-portal
+  profiles:
+    active: dev #默认为开发环境
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+server:
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+logging:
+  charset:
+    console: UTF-8
+    file: UTF-8
+
+mybatis:
+  mapper-locations:
+    - classpath:dao/*.xml
+    - classpath:dao/*/*.xml
+    - classpath*:com/**/mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+
+pagehelper:
+  helperDialect: postgresql
+  reasonable: true
+  supportMethodsArguments: true
+
+# H5支付配置
+h5:
+  payment:
+    provider: ${H5_PAYMENT_PROVIDER:LOCAL_SELF}
+    local-return-url: ${H5_PAYMENT_LOCAL_RETURN_URL:}
+    alipay:
+      app-id: "2021000122673521"
+      merchant-private-key: "MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC"
+      alipay-public-key: "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA"
+      notify-url: "http://localhost:8080/payment/h5/notify/alipay"
+      return-url: "http://localhost:8080/payment/h5/return"
+      sign-type: "RSA2"
+      charset: "UTF-8"
+    wechat:
+      app-id: "wx1234567890abcdef"
+      mch-id: "1234567890"
+      api-key: "abcdefghijk1234567890abcdefghijk"
+      notify-url: "http://localhost:8080/payment/h5/notify/wechat"
+    globepay:
+      base-url: "https://pay.globepay.co.jp"
+      partner-code: "PARTNER001"
+      credential-code: "CREDENTIAL001"
+      notify-url: "http://localhost:8080/payment/h5/notify/creditcard"
+      return-url: "http://localhost:8080/payment/h5/return"
+      currency: "JPY"
+      timeout-minutes: 30
+    stripe:
+      secret-key: ${STRIPE_SECRET_KEY:}
+      webhook-secret: ${STRIPE_WEBHOOK_SECRET:}
+      success-url: ${STRIPE_SUCCESS_URL:http://localhost:8060/orders/{orderId}}
+      cancel-url: ${STRIPE_CANCEL_URL:http://localhost:8060/orders/{orderId}/pay}
+
+jwt:
+  tokenHeader: Authorization #JWT存储的请求头
+  secret: mall-portal-secret #JWT加解密使用的密钥
+  expiration: 604800 #JWT的超期限时间(60*60*24*7)
+  tokenHead: 'Bearer '  #JWT负载中拿到开头
+
+secure:
+  ignored:
+    urls: #安全路径白名单
+      - /swagger-ui/**
+      - /swagger-resources/**
+      - /v2/api-docs/**
+      - /v3/api-docs/**
+      - /webjars/**
+      - /doc.html
+      - /favicon.ico
+      - /sso/login
+      - /sso/register
+      - /sso/register/json
+      - /sso/resetPassword
+      - /sso/resetPassword/confirm
+      - /sso/email/confirm
+      - /confirm-email
+      - /sso/getAuthCode
+      - /member/register
+      - /member/login
+      - /member/getAuthCode
+      - /home/**
+      - /product/**
+      - /brand/**
+      - /productCategory/**
+      - /payment/h5/admin/confirm
+      - /static/**
+      - /actuator/**
+
+# 自定义redis key
+redis:
+  database: mall
+  key:
+    authCode: 'ums:authCode'
+    orderId: 'oms:orderId'
+    member: 'ums:member'
+  expire:
+    authCode: 90 # 验证码超期时间
+    common: 86400 # 24小时
+
+# 订单相关配置
+order:
+  modify:
+    deadline: 3 # 订单修改截止时间（天数）
+
+mall:
+  order:
+    cancel-scan-delay-ms: 60000
+    cancel-scan-initial-delay-ms: 60000
+  admin:
+    base-url: ${MALL_ADMIN_BASE_URL:http://localhost:8080} # 管理端服务地址
+
+# GlobePay支付配置
+globepay:
+  base-url: https://pay.globepay.co.jp
+  partner-code: ${GLOBEPAY_PARTNER_CODE:} # 商户编码，请在环境变量中设置
+  credential-code: ${GLOBEPAY_CREDENTIAL_CODE:} # 开发校验码，请在环境变量中设置
+  notify-url: ${GLOBEPAY_NOTIFY_URL:http://localhost/portal/payment/h5/notify/globepay} # 支付通知URL (通过Nginx代理)
+  redirect-url: ${GLOBEPAY_REDIRECT_URL:http://localhost/portal/payment/success.html} # 支付成功跳转URL (通过Nginx代理)
+  credit-card-return-url: ${GLOBEPAY_CREDIT_CARD_RETURN_URL:http://localhost/portal/h5-payment-test.html} # 信用卡绑卡成功返回URL (通过Nginx代理)
+  default-currency: JPY # 默认货币，JPY或CNY
+  sign-valid-minutes: 5 # 签名有效期（分钟）

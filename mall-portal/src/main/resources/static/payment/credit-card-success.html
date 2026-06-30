@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>信用卡支付成功 - 日货商城</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 500px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 30px 20px;
+            position: relative;
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 40px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .header p {
+            margin: 10px 0 0;
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .payment-details {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+            padding: 10px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+            font-weight: bold;
+            font-size: 18px;
+            color: #4CAF50;
+        }
+
+        .detail-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .credit-card-info {
+            background: linear-gradient(135deg, #FF6B6B 0%, #EE5A52 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            position: relative;
+            box-shadow: 0 8px 25px rgba(238, 90, 82, 0.3);
+        }
+
+        .card-chip {
+            width: 30px;
+            height: 25px;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            border-radius: 4px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .card-chip::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            right: 3px;
+            bottom: 3px;
+            background: linear-gradient(135deg, #B8860B 0%, #DAA520 100%);
+            border-radius: 2px;
+        }
+
+        .card-number {
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            letter-spacing: 2px;
+            margin: 10px 0;
+        }
+
+        .card-holder {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 15px;
+        }
+
+        .security-badge {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 25px;
+            padding: 8px 15px;
+            margin: 20px 0;
+            display: inline-block;
+            font-size: 14px;
+        }
+
+        .actions {
+            margin-top: 30px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            margin: 10px;
+            border: none;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .container {
+            animation: fadeIn 0.8s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="success-icon">✓</div>
+            <h1>支付成功</h1>
+            <p>您的信用卡支付已完成</p>
+        </div>
+        
+        <div class="content">
+            <div class="credit-card-info">
+                <div class="card-chip"></div>
+                <div class="card-number">**** **** **** 1234</div>
+                <div class="card-holder">CARD HOLDER</div>
+                <div class="security-badge">🔒 3DS2.0 安全验证</div>
+            </div>
+            
+            <div class="payment-details">
+                <div class="detail-row">
+                    <span class="detail-label">订单号:</span>
+                    <span class="detail-value" id="orderNumber">GP1234567890123</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">支付方式:</span>
+                    <span class="detail-value">信用卡支付</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">支付渠道:</span>
+                    <span class="detail-value">GlobePay 信用卡网关</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">交易时间:</span>
+                    <span class="detail-value" id="paymentTime">2025-07-26 14:30:25</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">支付金额:</span>
+                    <span class="detail-value" id="paymentAmount">¥100.00</span>
+                </div>
+            </div>
+            
+            <div style="background: #e8f5e8; border-radius: 10px; padding: 15px; margin: 20px 0;">
+                <p style="margin: 0; color: #2e7d32; font-size: 14px;">
+                    <strong>✓ 安全保障:</strong> 本次交易已通过3DS2.0安全验证，您的信用卡信息得到银行级安全保护。
+                </p>
+            </div>
+            
+            <div class="actions">
+                <a href="/portal/payment/h5/test" class="btn btn-secondary">继续测试</a>
+                <a href="/" class="btn btn-primary">返回首页</a>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>交易凭证已发送至您的邮箱，如有疑问请联系 <a href="mailto:support@mall.com">客服中心</a></p>
+            <p style="margin-top: 10px; font-size: 12px;">
+                支付服务由 <strong>GlobePay</strong> 提供 | 
+                <a href="/privacy">隐私政策</a> | 
+                <a href="/terms">服务条款</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // 从URL参数中获取支付信息
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // 更新页面信息
+        const orderNumber = urlParams.get('orderSn') || 'GP' + Date.now();
+        const amount = urlParams.get('amount') || '100.00';
+        const currency = urlParams.get('currency') || 'JPY';
+        
+        document.getElementById('orderNumber').textContent = orderNumber;
+        document.getElementById('paymentAmount').textContent = 
+            currency === 'JPY' ? `¥${amount}` : `￥${amount}`;
+        document.getElementById('paymentTime').textContent = 
+            new Date().toLocaleString('zh-CN', { 
+                year: 'numeric', 
+                month: '2-digit', 
+                day: '2-digit', 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit' 
+            });
+        
+        // 自动返回首页倒计时（可选）
+        let countdown = 30;
+        const updateCountdown = () => {
+            if (countdown > 0) {
+                countdown--;
+                setTimeout(updateCountdown, 1000);
+            } else {
+                // window.location.href = '/';
+            }
+        };
+        // updateCountdown(); // 取消自动跳转，让用户手动选择
+    </script>
+</body>
+</html>

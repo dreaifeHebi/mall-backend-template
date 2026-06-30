@@ -1,0 +1,35 @@
+# 定时任务相关配置
+
+# 订单超时配置（分钟）
+order:
+  timeout:
+    minutes: 1440
+
+# 数据统计相关配置
+statistics:
+  # 报表文件存储路径
+  report:
+    path: /var/reports/daily
+  # 归档文件存储路径  
+  archive:
+    path: /var/reports/archive
+  # 数据保留天数
+  retention:
+    days: 365
+
+# 定时任务开关配置
+batch:
+  # 订单处理任务开关
+  order-processing:
+    enabled: true
+  # 数据统计任务开关
+  data-statistics:
+    enabled: true
+
+# 邮件通知配置
+notification:
+  email:
+    # 发送订单取消通知
+    order-cancellation: false
+    # 发送订单状态变更通知
+    order-status-change: false

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>支付成功 - 日货商城</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 500px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 30px 20px;
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: #28a745;
+        }
+
+        .content {
+            padding: 30px 20px;
+        }
+
+        .order-info {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 5px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .info-value {
+            color: #333;
+            font-weight: bold;
+        }
+
+        .buttons {
+            margin-top: 30px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .payment-details {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="success-icon">✓</div>
+            <h1>支付成功！</h1>
+            <p>您的订单已支付完成</p>
+        </div>
+        
+        <div class="content">
+            <div class="order-info">
+                <div class="info-row">
+                    <span class="info-label">订单号：</span>
+                    <span class="info-value" id="orderSn">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">支付金额：</span>
+                    <span class="info-value" id="paymentAmount">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">支付方式：</span>
+                    <span class="info-value" id="paymentMethod">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">支付时间：</span>
+                    <span class="info-value" id="paymentTime">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">交易流水号：</span>
+                    <span class="info-value" id="tradeNo">-</span>
+                </div>
+            </div>
+
+            <div class="payment-details">
+                <p><strong>温馨提示：</strong></p>
+                <p>• 您的订单将在1-2个工作日内发货</p>
+                <p>• 如有问题，请联系客服：400-123-4567</p>
+                <p>• 感谢您对日货商城的信任与支持！</p>
+            </div>
+
+            <div class="buttons">
+                <a href="/portal/" class="btn btn-primary">返回首页</a>
+                <a href="/portal/member/order" class="btn btn-secondary">查看订单</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 解析URL参数
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            const result = {};
+            for (const [key, value] of params) {
+                result[key] = value;
+            }
+            return result;
+        }
+
+        // 格式化支付方式名称
+        function formatPaymentMethod(method) {
+            const methodMap = {
+                'ALIPAY_H5': '支付宝H5支付',
+                'WECHAT_H5': '微信H5支付', 
+                'CREDIT_CARD': '信用卡支付'
+            };
+            return methodMap[method] || method;
+        }
+
+        // 格式化时间
+        function formatTime(timestamp) {
+            if (!timestamp) return new Date().toLocaleString('zh-CN');
+            
+            const date = new Date(parseInt(timestamp));
+            return date.toLocaleString('zh-CN');
+        }
+
+        // 页面加载时显示支付信息
+        window.onload = function() {
+            const params = getUrlParams();
+            
+            // 显示URL参数中的信息
+            if (params.partner_order_id) {
+                document.getElementById('orderSn').textContent = params.partner_order_id;
+            }
+            
+            if (params.amount) {
+                const currency = params.currency || 'JPY';
+                document.getElementById('paymentAmount').textContent = `${params.amount} ${currency}`;
+            }
+            
+            if (params.channel) {
+                document.getElementById('paymentMethod').textContent = formatPaymentMethod(params.channel);
+            }
+            
+            if (params.time) {
+                document.getElementById('paymentTime').textContent = formatTime(params.time);
+            }
+            
+            if (params.transaction_id || params.order_id) {
+                document.getElementById('tradeNo').textContent = params.transaction_id || params.order_id;
+            }
+
+            // 如果没有URL参数，尝试从localStorage获取
+            if (!params.partner_order_id) {
+                const lastOrder = localStorage.getItem('lastPaymentOrder');
+                if (lastOrder) {
+                    try {
+                        const orderData = JSON.parse(lastOrder);
+                        document.getElementById('orderSn').textContent = orderData.orderSn || '-';
+                        document.getElementById('paymentAmount').textContent = `${orderData.amount || 0} ${orderData.currency || 'JPY'}`;
+                        document.getElementById('paymentMethod').textContent = formatPaymentMethod(orderData.paymentMethod || '');
+                        document.getElementById('paymentTime').textContent = new Date().toLocaleString('zh-CN');
+                    } catch (e) {
+                        console.error('解析支付订单数据失败:', e);
+                    }
+                }
+            }
+
+            // 清除localStorage中的订单数据
+            localStorage.removeItem('lastPaymentOrder');
+        };
+
+        // 自动跳转倒计时（可选）
+        let countdown = 10;
+        function startCountdown() {
+            const countdownElement = document.createElement('p');
+            countdownElement.style.marginTop = '20px';
+            countdownElement.style.color = '#666';
+            countdownElement.innerHTML = `<small>页面将在 <span id="countdown">${countdown}</span> 秒后自动跳转到首页</small>`;
+            
+            document.querySelector('.content').appendChild(countdownElement);
+            
+            const timer = setInterval(() => {
+                countdown--;
+                document.getElementById('countdown').textContent = countdown;
+                
+                if (countdown <= 0) {
+                    clearInterval(timer);
+                    window.location.href = '/portal/';
+                }
+            }, 1000);
+        }
+
+        // 可以选择启用自动跳转
+        // setTimeout(startCountdown, 3000);
+    </script>
+</body>
+</html>
