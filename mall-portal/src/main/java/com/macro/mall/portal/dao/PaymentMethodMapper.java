@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  * 支付方式Mapper接口
- * @author macrozheng
+ * @author dreaifekks
  * @date 2025/7/26
  */
 @Mapper

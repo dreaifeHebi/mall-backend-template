@@ -17,17 +17,17 @@ import java.util.List;
 
 /**
  * 退款服务适配器 - 通过HTTP调用Portal服务
- * @author macrozheng
+ * @author dreaifekks
  * @date 2025/7/27
  */
 @Service
 public class RefundServiceAdapter implements RefundService {
-    
+
     private static final Logger LOGGER = LoggerFactory.getLogger(RefundServiceAdapter.class);
-    
+
     @Value("${portal.service.base-url:http://localhost:8085}")
     private String portalBaseUrl;
-    
+
     @Resource
     private RestTemplate restTemplate;
 
@@ -41,17 +41,17 @@ public class RefundServiceAdapter implements RefundService {
     public CommonResult<RefundRequest> auditRefund(RefundAuditParam param, Long auditorId, String auditorName) {
         try {
             String url = portalBaseUrl + "/admin/refund/audit";
-            
+
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.set("Admin-Id", auditorId.toString());
             headers.set("Admin-Name", auditorName);
-            
+
             HttpEntity<RefundAuditParam> entity = new HttpEntity<>(param, headers);
-            
+
             ResponseEntity<CommonResult> response = restTemplate.exchange(
                 url, HttpMethod.POST, entity, CommonResult.class);
-            
+
             return response.getBody();
         } catch (Exception e) {
             LOGGER.error("调用Portal服务审核退款异常", e);
@@ -63,16 +63,16 @@ public class RefundServiceAdapter implements RefundService {
     public CommonResult<RefundRequest> processRefund(Long refundRequestId, Long operatorId, String operatorName) {
         try {
             String url = portalBaseUrl + "/admin/refund/process/" + refundRequestId;
-            
+
             HttpHeaders headers = new HttpHeaders();
             headers.set("Admin-Id", operatorId.toString());
             headers.set("Admin-Name", operatorName);
-            
+
             HttpEntity<?> entity = new HttpEntity<>(headers);
-            
+
             ResponseEntity<CommonResult> response = restTemplate.exchange(
                 url, HttpMethod.POST, entity, CommonResult.class);
-            
+
             return response.getBody();
         } catch (Exception e) {
             LOGGER.error("调用Portal服务处理退款异常", e);
@@ -84,10 +84,10 @@ public class RefundServiceAdapter implements RefundService {
     public CommonResult<RefundRequest> queryRefundStatus(Long refundRequestId) {
         try {
             String url = portalBaseUrl + "/admin/refund/status/" + refundRequestId;
-            
+
             ResponseEntity<CommonResult> response = restTemplate.exchange(
                 url, HttpMethod.GET, null, CommonResult.class);
-            
+
             return response.getBody();
         } catch (Exception e) {
             LOGGER.error("调用Portal服务查询退款状态异常", e);
@@ -117,15 +117,15 @@ public class RefundServiceAdapter implements RefundService {
     public CommonResult<List<RefundRequest>> getAdminRefundList(String status, Integer pageNum, Integer pageSize) {
         try {
             String url = portalBaseUrl + "/admin/refund/list";
-            
+
             StringBuilder urlBuilder = new StringBuilder(url).append("?pageNum=").append(pageNum).append("&pageSize=").append(pageSize);
             if (status != null && !status.isEmpty()) {
                 urlBuilder.append("&status=").append(status);
             }
-            
+
             ResponseEntity<CommonResult> response = restTemplate.exchange(
                 urlBuilder.toString(), HttpMethod.GET, null, CommonResult.class);
-            
+
             return response.getBody();
         } catch (Exception e) {
             LOGGER.error("调用Portal服务查询管理员退款列表异常", e);
@@ -137,10 +137,10 @@ public class RefundServiceAdapter implements RefundService {
     public CommonResult<RefundRequest> getAdminRefundDetail(Long refundRequestId) {
         try {
             String url = portalBaseUrl + "/admin/refund/" + refundRequestId;
-            
+
             ResponseEntity<CommonResult> response = restTemplate.exchange(
                 url, HttpMethod.GET, null, CommonResult.class);
-            
+
             return response.getBody();
         } catch (Exception e) {
             LOGGER.error("调用Portal服务查询管理员退款详情异常", e);
@@ -152,10 +152,10 @@ public class RefundServiceAdapter implements RefundService {
     public CommonResult<Integer> autoQueryPendingRefunds() {
         try {
             String url = portalBaseUrl + "/admin/refund/auto-query";
-            
+
             ResponseEntity<CommonResult> response = restTemplate.exchange(
                 url, HttpMethod.POST, null, CommonResult.class);
-            
+
             return response.getBody();
         } catch (Exception e) {
             LOGGER.error("调用Portal服务自动查询待处理退款异常", e);

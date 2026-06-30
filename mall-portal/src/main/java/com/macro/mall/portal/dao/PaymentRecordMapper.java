@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * 支付记录Mapper接口
- * @author macrozheng
+ * @author dreaifekks
  * @date 2025/7/26
  */
 @Mapper
@@ -32,7 +32,7 @@ public interface PaymentRecordMapper {
     /**
      * 根据订单号和支付渠道查询
      */
-    PaymentRecord selectByOrderSnAndChannel(@Param("orderSn") String orderSn, 
+    PaymentRecord selectByOrderSnAndChannel(@Param("orderSn") String orderSn,
                                           @Param("paymentChannel") String paymentChannel);
 
     /**
@@ -53,8 +53,8 @@ public interface PaymentRecordMapper {
     /**
      * 更新支付状态
      */
-    int updatePaymentStatus(@Param("id") Long id, 
-                           @Param("paymentStatus") String paymentStatus, 
+    int updatePaymentStatus(@Param("id") Long id,
+                           @Param("paymentStatus") String paymentStatus,
                            @Param("paymentTime") String paymentTime);
 
     /**

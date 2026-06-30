@@ -13,11 +13,11 @@ import java.util.Map;
 
 /**
  * 退款服务接口
- * @author macrozheng
+ * @author dreaifekks
  * @date 2025/10/13
  */
 public interface RefundService {
-    
+
     /**
      * 申请退款（会员端使用）
      * @param param 退款申请参数
@@ -25,7 +25,7 @@ public interface RefundService {
      * @return 退款申请结果
      */
     CommonResult<RefundRequest> applyRefund(RefundApplyParam param, Long memberId);
-    
+
     /**
      * 管理员代为申请退款
      * @param param 退款申请参数
@@ -35,7 +35,7 @@ public interface RefundService {
      * @return 退款申请结果
      */
     CommonResult<RefundRequest> adminApplyRefund(RefundApplyParam param, Long memberId, Long adminId, String adminName);
-    
+
     /**
      * 审核退款申请
      * @param param 审核参数
@@ -44,7 +44,7 @@ public interface RefundService {
      * @return 审核结果
      */
     CommonResult<RefundRequest> auditRefund(RefundAuditParam param, Long auditorId, String auditorName);
-    
+
     /**
      * 处理退款（发起第三方退款）
      * @param refundRequestId 退款申请ID
@@ -53,14 +53,14 @@ public interface RefundService {
      * @return 处理结果
      */
     CommonResult<RefundRequest> processRefund(Long refundRequestId, Long operatorId, String operatorName);
-    
+
     /**
      * 查询退款状态
      * @param refundRequestId 退款申请ID
      * @return 查询结果
      */
     CommonResult<RefundRequest> queryRefundStatus(Long refundRequestId);
-    
+
     /**
      * 取消退款申请
      * @param refundRequestId 退款申请ID
@@ -70,7 +70,7 @@ public interface RefundService {
      * @return 取消结果
      */
     CommonResult<Void> cancelRefund(Long refundRequestId, Long memberId, Long operatorId, String operatorName);
-    
+
     /**
      * 获取会员的退款申请列表
      * @param memberId 会员ID
@@ -80,7 +80,7 @@ public interface RefundService {
      * @return 退款申请列表
      */
     CommonResult<CommonPage<RefundRequest>> getMemberRefundList(Long memberId, String status, Integer pageNum, Integer pageSize);
-    
+
     /**
      * 获取退款申请详情
      * @param refundRequestId 退款申请ID
@@ -88,7 +88,7 @@ public interface RefundService {
      * @return 退款申请详情
      */
     CommonResult<RefundRequest> getRefundDetail(Long refundRequestId, Long memberId);
-    
+
     /**
      * 管理员获取退款申请列表
      * @param status 退款状态（可选）
@@ -104,20 +104,20 @@ public interface RefundService {
     CommonResult<CommonPage<RefundRequest>> getAdminRefundList(String status, Date startDate, Date endDate,
                                                         String memberUsername, String orderSn, String refundSn,
                                                         Integer pageNum, Integer pageSize, Long orderId);
-    
+
     /**
      * 管理员获取退款申请详情
      * @param refundRequestId 退款申请ID
      * @return 退款申请详情
      */
     CommonResult<RefundRequest> getAdminRefundDetail(Long refundRequestId);
-    
+
     /**
      * 系统自动查询待处理的退款状态
      * @return 处理结果
      */
     CommonResult<Integer> autoQueryPendingRefunds();
-    
+
     /**
      * 批量处理退款
      * @param param 批量处理参数
@@ -126,7 +126,7 @@ public interface RefundService {
      * @return 处理结果
      */
     CommonResult<Map<String, Object>> batchProcessRefunds(BatchRefundProcessParam param, Long operatorId, String operatorName);
-    
+
     /**
      * 强制退款成功（管理员操作）
      * @param refundRequestId 退款申请ID
@@ -136,7 +136,7 @@ public interface RefundService {
      * @return 处理结果
      */
     CommonResult<RefundRequest> forceRefundSuccess(Long refundRequestId, Long operatorId, String operatorName, String reason);
-    
+
     /**
      * 强制退款失败（管理员操作）
      * @param refundRequestId 退款申请ID
@@ -146,7 +146,7 @@ public interface RefundService {
      * @return 处理结果
      */
     CommonResult<RefundRequest> forceRefundFail(Long refundRequestId, Long operatorId, String operatorName, String reason);
-    
+
     /**
      * 重试失败的退款
      * @param refundRequestId 退款申请ID
@@ -155,7 +155,7 @@ public interface RefundService {
      * @return 处理结果
      */
     CommonResult<RefundRequest> retryFailedRefund(Long refundRequestId, Long operatorId, String operatorName);
-    
+
     /**
      * 获取退款统计信息
      * @param startDate 开始日期
@@ -163,7 +163,7 @@ public interface RefundService {
      * @return 统计信息
      */
     CommonResult<Map<String, Object>> getRefundStatistics(Date startDate, Date endDate);
-    
+
     /**
      * 获取每日退款统计
      * @param startDate 开始日期
@@ -171,7 +171,7 @@ public interface RefundService {
      * @return 每日统计数据
      */
     CommonResult<List<Map<String, Object>>> getDailyRefundStatistics(Date startDate, Date endDate);
-    
+
     /**
      * 处理超时的退款申请
      * @return 处理结果

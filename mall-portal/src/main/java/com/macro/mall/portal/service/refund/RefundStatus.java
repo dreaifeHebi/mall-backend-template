@@ -2,7 +2,7 @@ package com.macro.mall.portal.service.refund;
 
 /**
  * 退款状态枚举
- * @author macrozheng
+ * @author dreaifekks
  * @date 2025/10/14
  */
 public enum RefundStatus {

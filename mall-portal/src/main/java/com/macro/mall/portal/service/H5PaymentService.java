@@ -11,7 +11,7 @@ import java.util.Map;
 
 /**
  * H5支付服务接口
- * @author macrozheng
+ * @author dreaifekks
  * @date 2025/7/26
  */
 public interface H5PaymentService {
@@ -50,12 +50,12 @@ public interface H5PaymentService {
      * 信用卡通知处理
      */
     String handleCreditCardNotify(Map<String, String> params);
-    
+
     /**
      * GlobePay通知处理（表单格式）
      */
     String handleGlobePayNotify(Map<String, String> params);
-    
+
     /**
      * GlobePay通知处理（JSON格式）
      */

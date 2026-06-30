@@ -11,21 +11,21 @@ import java.math.BigDecimal;
 
 /**
  * 退款申请请求参数
- * @author macrozheng
+ * @author dreaifekks
  * @date 2025/7/27
  */
 @ApiModel(description = "退款申请请求参数")
 public class RefundApplyParam {
-    
+
     @ApiModelProperty(value = "订单ID", required = true)
     @NotNull(message = "订单ID不能为空")
     private Long orderId;
-    
+
     @ApiModelProperty(value = "退款金额", required = true)
     @NotNull(message = "退款金额不能为空")
     @Positive(message = "退款金额必须大于0")
     private BigDecimal refundAmount;
-    
+
     @ApiModelProperty(value = "退款原因", required = true)
     @NotBlank(message = "退款原因不能为空")
     @Size(max = 500, message = "退款原因长度不能超过500字符")

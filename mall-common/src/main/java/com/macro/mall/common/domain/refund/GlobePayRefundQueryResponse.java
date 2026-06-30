@@ -6,62 +6,62 @@ import io.swagger.annotations.ApiModelProperty;
 
 /**
  * GlobePay退款查询响应结果
- * @author macrozheng
+ * @author dreaifekks
  * @date 2025/7/27
  */
 @ApiModel(description = "GlobePay退款查询响应结果")
 public class GlobePayRefundQueryResponse {
-    
+
     @ApiModelProperty(value = "执行结果")
     @JsonProperty("return_code")
     private String returnCode;
-    
+
     @ApiModelProperty(value = "返回消息")
     @JsonProperty("return_msg")
     private String returnMsg;
-    
+
     @ApiModelProperty(value = "结果码")
-    @JsonProperty("result_code") 
+    @JsonProperty("result_code")
     private String resultCode;
-    
+
     @ApiModelProperty(value = "GlobePay退款单号")
     @JsonProperty("refund_id")
     private String refundId;
-    
+
     @ApiModelProperty(value = "商户退款单号")
     @JsonProperty("partner_refund_id")
     private String partnerRefundId;
-    
+
     @ApiModelProperty(value = "退款金额")
     @JsonProperty("amount")
     private Integer amount;
-    
+
     @ApiModelProperty(value = "币种")
     @JsonProperty("currency")
     private String currency;
-    
+
     // 兼容性字段
     @ApiModelProperty(value = "响应码（兼容）")
     private String code;
-    
+
     @ApiModelProperty(value = "响应消息（兼容）")
     private String message;
-    
+
     @ApiModelProperty(value = "是否成功（兼容）")
     private Boolean success;
-    
+
     @ApiModelProperty(value = "商户退款单号（兼容）")
     private String merRefundId;
-    
+
     @ApiModelProperty(value = "退款状态（兼容）")
     private String refundStatus;
-    
+
     @ApiModelProperty(value = "退款金额（分）（兼容）")
     private Long refundAmount;
-    
+
     @ApiModelProperty(value = "退款时间（兼容）")
     private String refundTime;
-    
+
     @ApiModelProperty(value = "退款完成时间（兼容）")
     private String refundCompleteTime;
 

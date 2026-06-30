@@ -4,64 +4,64 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * GlobePay H5支付响应
- * @author macrozheng
+ * @author dreaifekks
  * @date 2025/7/26
  */
 public class GlobePayH5Response {
-    
+
     /**
      * 执行结果
      */
     @JsonProperty("return_code")
     private String returnCode;
-    
+
     /**
      * SUCCESS表示创建订单成功，EXISTS表示订单已存在
      */
     @JsonProperty("result_code")
     private String resultCode;
-    
+
     /**
      * 商户编码
      */
     @JsonProperty("partner_code")
     private String partnerCode;
-    
+
     /**
      * 支付渠道
      */
     private String channel;
-    
+
     /**
      * 商户注册全名
      */
     @JsonProperty("full_name")
     private String fullName;
-    
+
     /**
      * 商户名称
      */
     @JsonProperty("partner_name")
     private String partnerName;
-    
+
     /**
      * GlobePay订单ID，同时也是微信订单ID，最终支付成功的订单ID可能不同
      */
     @JsonProperty("order_id")
     private String orderId;
-    
+
     /**
      * 商户订单ID
      */
     @JsonProperty("partner_order_id")
     private String partnerOrderId;
-    
+
     /**
      * 跳转URL
      */
     @JsonProperty("pay_url")
     private String payUrl;
-    
+
     /**
      * 错误信息
      */

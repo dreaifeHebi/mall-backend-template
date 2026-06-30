@@ -21,14 +21,14 @@ import java.util.Date;
 
 /**
  * 退款管理控制器（管理员端）
- * @author macrozheng
+ * @author dreaifekks
  * @date 2025/7/27
  */
 @RestController
 @Api(tags = "AdminRefundController", description = "管理员退款管理")
 @RequestMapping("/admin/refund")
 public class AdminRefundController {
-    
+
     @Autowired
     private RefundService refundService;
 
@@ -87,9 +87,9 @@ public class AdminRefundController {
     public CommonResult<Integer> autoQueryPendingRefunds() {
         return refundService.autoQueryPendingRefunds();
     }
-    
+
     // ==================== 会员端退款API ====================
-    
+
     @ApiOperation("会员申请退款")
     @PostMapping("/member/apply")
     public CommonResult<RefundRequest> memberApplyRefund(@Validated @RequestBody RefundApplyParam param,
@@ -98,7 +98,7 @@ public class AdminRefundController {
         String memberName = getMemberNameFromRequest(request);
         return refundService.applyRefund(param, memberId);
     }
-    
+
     @ApiOperation("会员取消退款申请")
     @PostMapping("/member/cancel/{refundRequestId}")
     public CommonResult<Void> memberCancelRefund(@ApiParam("退款申请ID") @PathVariable Long refundRequestId,
@@ -107,7 +107,7 @@ public class AdminRefundController {
         String memberName = getMemberNameFromRequest(request);
         return refundService.cancelRefund(refundRequestId, memberId, null, memberName);
     }
-    
+
     @ApiOperation("获取会员退款申请列表")
     @GetMapping("/member/list")
     public CommonResult<CommonPage<RefundRequest>> getMemberRefundList(
@@ -119,7 +119,7 @@ public class AdminRefundController {
         CommonResult<CommonPage<RefundRequest>> result = refundService.getMemberRefundList(memberId, status, pageNum, pageSize);
         return result;
     }
-    
+
     @ApiOperation("获取会员退款申请详情")
     @GetMapping("/member/{refundRequestId}")
     public CommonResult<RefundRequest> getMemberRefundDetail(
@@ -128,7 +128,7 @@ public class AdminRefundController {
         Long memberId = getMemberIdFromRequest(request);
         return refundService.getRefundDetail(refundRequestId, memberId);
     }
-    
+
     /**
      * 从请求中获取管理员ID
      * TODO: 实际项目中应该从JWT token或session中获取
@@ -140,7 +140,7 @@ public class AdminRefundController {
         }
         return 1L; // 默认管理员ID
     }
-    
+
     /**
      * 从请求中获取管理员姓名
      * TODO: 实际项目中应该从JWT token或session中获取
@@ -152,7 +152,7 @@ public class AdminRefundController {
         }
         return "admin"; // 默认管理员姓名
     }
-    
+
     /**
      * 从请求中获取会员ID
      */
@@ -163,7 +163,7 @@ public class AdminRefundController {
         }
         return 1L; // 默认会员ID
     }
-    
+
     /**
      * 从请求中获取会员姓名
      */

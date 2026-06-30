@@ -7,11 +7,11 @@ import java.util.UUID;
 
 /**
  * GlobePay签名工具类
- * @author macrozheng
+ * @author dreaifekks
  * @date 2025/7/26
  */
 public class GlobePaySignUtils {
-    
+
     /**
      * 生成签名
      * @param partnerCode 商户编码
@@ -23,12 +23,12 @@ public class GlobePaySignUtils {
     public static String generateSign(String partnerCode, long time, String nonceStr, String credentialCode) {
         // 按照 partner_code&time&nonce_str&credential_code 的顺序连接
         String validString = partnerCode + "&" + time + "&" + nonceStr + "&" + credentialCode;
-        
+
         try {
             // 使用SHA256进行签名
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(validString.getBytes(StandardCharsets.UTF_8));
-            
+
             // 转为Hex小写字符串
             StringBuilder hexString = new StringBuilder();
             for (byte b : hash) {
@@ -38,13 +38,13 @@ public class GlobePaySignUtils {
                 }
                 hexString.append(hex);
             }
-            
+
             return hexString.toString().toLowerCase();
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("SHA-256算法不支持", e);
         }
     }
-    
+
     /**
      * 生成随机字符串
      * @return 随机字符串（去掉横线的UUID）
@@ -52,7 +52,7 @@ public class GlobePaySignUtils {
     public static String generateNonceStr() {
         return UUID.randomUUID().toString().replace("-", "");
     }
-    
+
     /**
      * 获取当前UTC毫秒时间戳
      * @return UTC毫秒时间戳
@@ -60,7 +60,7 @@ public class GlobePaySignUtils {
     public static long getCurrentUtcTime() {
         return System.currentTimeMillis();
     }
-    
+
     /**
      * 验证签名
      * @param partnerCode 商户编码
@@ -74,7 +74,7 @@ public class GlobePaySignUtils {
         String expectedSign = generateSign(partnerCode, time, nonceStr, credentialCode);
         return expectedSign.equals(sign);
     }
-    
+
     /**
      * 检查签名是否超时
      * @param time 签名时间戳

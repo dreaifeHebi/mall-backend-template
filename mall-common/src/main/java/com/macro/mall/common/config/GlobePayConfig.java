@@ -5,48 +5,48 @@ import org.springframework.stereotype.Component;
 
 /**
  * GlobePay配置类
- * @author macrozheng
+ * @author dreaifekks
  * @date 2025/7/26
  */
 @Component
 @ConfigurationProperties(prefix = "globepay")
 public class GlobePayConfig {
-    
+
     /**
      * 生产环境域名
      */
     private String baseUrl = "https://pay.globepay.co.jp";
-    
+
     /**
      * 商户编码，由4~6位大写字母或数字构成
      */
     private String partnerCode;
-    
+
     /**
      * 系统为商户分配的开发校验码
      */
     private String credentialCode;
-    
+
     /**
      * 支付通知URL
      */
     private String notifyUrl;
-    
+
     /**
      * 支付成功后跳转URL
      */
     private String redirectUrl;
-    
+
     /**
      * 信用卡绑卡成功后返回URL
      */
     private String creditCardReturnUrl;
-    
+
     /**
      * 默认货币类型
      */
     private String defaultCurrency = "JPY";
-    
+
     /**
      * 签名有效期（分钟）
      */

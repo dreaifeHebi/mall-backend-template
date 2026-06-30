@@ -8,7 +8,7 @@ import org.springframework.web.client.RestTemplate;
 
 /**
  * HTTP客户端配置
- * @author macrozheng
+ * @author dreaifekks
  * @date 2025/8/3
  */
 @Configuration

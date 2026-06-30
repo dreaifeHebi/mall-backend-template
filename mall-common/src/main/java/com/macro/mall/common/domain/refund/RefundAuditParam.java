@@ -9,20 +9,20 @@ import javax.validation.constraints.Size;
 
 /**
  * 退款审核请求参数
- * @author macrozheng
+ * @author dreaifekks
  * @date 2025/7/27
  */
 @ApiModel(description = "退款审核请求参数")
 public class RefundAuditParam {
-    
+
     @ApiModelProperty(value = "退款申请ID", required = true)
     @NotNull(message = "退款申请ID不能为空")
     private Long refundRequestId;
-    
+
     @ApiModelProperty(value = "审核状态", required = true, example = "APPROVED,REJECTED")
     @NotBlank(message = "审核状态不能为空")
     private String auditStatus;
-    
+
     @ApiModelProperty(value = "审核备注")
     @Size(max = 500, message = "审核备注长度不能超过500字符")
     private String auditNote;

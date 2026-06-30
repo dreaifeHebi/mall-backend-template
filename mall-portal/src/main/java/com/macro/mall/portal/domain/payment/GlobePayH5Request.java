@@ -4,43 +4,43 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * GlobePay H5支付请求参数
- * @author macrozheng
+ * @author dreaifekks
  * @date 2025/7/26
  */
 public class GlobePayH5Request {
-    
+
     /**
      * 订单标题（最大长度128字符，超出自动截取）
      */
     private String description;
-    
+
     /**
      * 金额，单位为货币最小单位，例如使用100表示100 JPY
      */
     private Integer price;
-    
+
     /**
      * 币种代码，默认JPY，允许值: JPY, CNY
      */
     private String currency = "JPY";
-    
+
     /**
      * 预授权标记，当前订单是否使用预授权模式，默认false
      */
     private Boolean preauth = false;
-    
+
     /**
      * 支付渠道，大小写敏感，允许值: Alipay, Alipay+, Wechat, UnionPay
      */
     private String channel;
-    
+
     /**
      * 支付通知url，详见支付通知api，不填则不会推送支付通知
      * notify_url
      */
     @JsonProperty("notify_url")
     private String notifyUrl;
-    
+
     /**
      * 操作人员标识
      */

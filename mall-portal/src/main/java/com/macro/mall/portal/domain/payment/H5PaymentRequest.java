@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 
 /**
  * H5支付请求参数
- * @author macrozheng
+ * @author dreaifekks
  * @date 2025/7/26
  */
 @ApiModel("H5支付请求参数")

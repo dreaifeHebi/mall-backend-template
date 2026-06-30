@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * H5支付配置类
- * @author macrozheng
+ * @author dreaifekks
  * @date 2025/7/26
  */
 @Configuration

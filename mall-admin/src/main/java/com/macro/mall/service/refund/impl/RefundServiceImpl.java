@@ -23,8 +23,8 @@ import java.util.*;
 
 /**
  * 退款服务实现类
- * 
- * @author macrozheng
+ *
+ * @author dreaifekks
  * @date 2025/10/13
  */
 @Service
@@ -634,7 +634,7 @@ public class RefundServiceImpl implements RefundService {
 
     /**
      * 退款成功后更新订单状态
-     * 
+     *
      * @param refundRequest 退款申请
      */
     private void updateOrderStatusOnRefundSuccess(RefundRequest refundRequest) {

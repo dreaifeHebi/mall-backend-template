@@ -8,66 +8,66 @@ import java.util.Date;
 
 /**
  * 退款申请实体类 - 基于现有 refund_request 表
- * @author macrozheng
+ * @author dreaifekks
  * @date 2025/10/13
  */
 @ApiModel(description = "退款申请")
 public class RefundRequest {
-    
+
     @ApiModelProperty(value = "退款申请ID")
     private Long id;
-    
+
     @ApiModelProperty(value = "退款单号")
     private String refundSn;
-    
+
     @ApiModelProperty(value = "订单ID")
     private Long orderId;
-    
+
     @ApiModelProperty(value = "订单号")
     private String orderSn;
-    
+
     @ApiModelProperty(value = "支付记录ID")
     private Long paymentRecordId;
-    
+
     @ApiModelProperty(value = "会员ID")
     private Long memberId;
-    
+
     @ApiModelProperty(value = "会员用户名")
     private String memberUsername;
-    
+
     @ApiModelProperty(value = "退款金额")
     private BigDecimal refundAmount;
-    
+
     @ApiModelProperty(value = "退款原因")
     private String refundReason;
-    
+
     @ApiModelProperty(value = "退款状态")
     private String status;
-    
+
     @ApiModelProperty(value = "申请时间")
     private Date applyTime;
-    
+
     @ApiModelProperty(value = "审核时间")
     private Date auditTime;
-    
+
     @ApiModelProperty(value = "审核人ID")
     private Long auditorId;
-    
+
     @ApiModelProperty(value = "审核人姓名")
     private String auditorName;
-    
+
     @ApiModelProperty(value = "审核备注")
     private String auditNote;
-    
+
     @ApiModelProperty(value = "第三方退款单号")
     private String thirdPartyRefundId;
-    
+
     @ApiModelProperty(value = "退款完成时间")
     private Date refundTime;
-    
+
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
-    
+
     @ApiModelProperty(value = "更新时间")
     private Date updateTime;
 

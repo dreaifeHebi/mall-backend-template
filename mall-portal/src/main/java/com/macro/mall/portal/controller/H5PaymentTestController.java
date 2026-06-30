@@ -14,7 +14,7 @@ import java.util.Map;
 
 /**
  * H5支付测试页面Controller
- * @author macrozheng
+ * @author dreaifekks
  * @date 2025/7/26
  */
 @Controller
@@ -51,7 +51,7 @@ public class H5PaymentTestController {
         testData.put("totalAmount", 100.50);
         testData.put("subject", "商品购买测试");
         testData.put("currency", "JPY");
-        
+
         return CommonResult.success(testData, "获取测试数据成功");
     }
 }

@@ -24,7 +24,7 @@ import java.util.Map;
 
 /**
  * H5支付Controller
- * @author macrozheng
+ * @author dreaifekks
  * @date 2025/7/26
  */
 @Controller
@@ -49,13 +49,13 @@ public class H5PaymentController {
             LOGGER.info("订单号: {}", request.getOrderSn());
             LOGGER.info("支付渠道: {}", request.getPaymentChannel());
             LOGGER.info("支付金额: {}", request.getTotalAmount());
-            
+
             H5PaymentResponse response = h5PaymentService.createPayment(request);
-            
+
             LOGGER.info("=== H5支付订单创建API响应 ===");
             LOGGER.info("响应结果: {}", response);
             LOGGER.info("创建状态: {}", response.getSuccess() ? "成功" : "失败");
-            
+
             if (response.getSuccess()) {
                 LOGGER.info("=== H5支付订单创建API调用成功 ===");
                 return CommonResult.success(response, "支付订单创建成功");
@@ -78,7 +78,7 @@ public class H5PaymentController {
     @ApiOperation("查询支付状态")
     @RequestMapping(value = "/status/{orderSn}/{paymentChannel}", method = RequestMethod.GET)
     @ResponseBody
-    public CommonResult<PaymentRecord> queryPaymentStatus(@PathVariable String orderSn, 
+    public CommonResult<PaymentRecord> queryPaymentStatus(@PathVariable String orderSn,
                                                          @PathVariable String paymentChannel) {
         try {
             PaymentRecord record = h5PaymentService.queryPaymentStatus(orderSn, paymentChannel);
@@ -96,7 +96,7 @@ public class H5PaymentController {
     @ApiOperation("取消支付")
     @RequestMapping(value = "/cancel", method = RequestMethod.POST)
     @ResponseBody
-    public CommonResult<Boolean> cancelPayment(@RequestParam String orderSn, 
+    public CommonResult<Boolean> cancelPayment(@RequestParam String orderSn,
                                               @RequestParam String paymentChannel) {
         try {
             boolean result = h5PaymentService.cancelPayment(orderSn, paymentChannel);
@@ -147,7 +147,7 @@ public class H5PaymentController {
             for (String name : requestParams.keySet()) {
                 params.put(name, request.getParameter(name));
             }
-            
+
             LOGGER.info("接收到支付宝通知: {}", params);
             return h5PaymentService.handleAlipayNotify(params);
         } catch (Exception e) {
@@ -177,9 +177,9 @@ public class H5PaymentController {
             LOGGER.info("=== 接收到GlobePay异步通知 ===");
             LOGGER.info("Content-Type: {}", request.getContentType());
             LOGGER.info("请求体: {}", jsonBody);
-            
+
             // 判断是JSON格式还是表单格式
-            if (jsonBody != null && !jsonBody.trim().isEmpty() && 
+            if (jsonBody != null && !jsonBody.trim().isEmpty() &&
                 request.getContentType() != null && request.getContentType().contains("application/json")) {
                 // JSON格式通知
                 LOGGER.info("处理JSON格式通知");
@@ -192,7 +192,7 @@ public class H5PaymentController {
                 for (String name : requestParams.keySet()) {
                     params.put(name, request.getParameter(name));
                 }
-                
+
                 LOGGER.info("接收到GlobePay表单通知: {}", params);
                 return h5PaymentService.handleGlobePayNotify(params);
             }

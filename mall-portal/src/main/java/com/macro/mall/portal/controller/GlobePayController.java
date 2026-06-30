@@ -18,7 +18,7 @@ import javax.validation.Valid;
 
 /**
  * GlobePay支付Controller
- * @author macrozheng
+ * @author dreaifekks
  * @date 2025/7/27
  */
 @Controller
@@ -42,24 +42,24 @@ public class GlobePayController {
             if (orderId == null || orderId.trim().isEmpty()) {
                 orderId = "GP" + System.currentTimeMillis();
             }
-            
+
             // 转换为GlobePay请求格式
             GlobePayH5Request globePayRequest = new GlobePayH5Request();
             globePayRequest.setDescription(request.getSubject());
             globePayRequest.setPrice(request.getTotalAmount().intValue());
             globePayRequest.setChannel("CREDIT_CARD");
             globePayRequest.setNotifyUrl("http://localhost:8085/payment/h5/notify/globepay");
-            
+
             LOGGER.info("创建信用卡绑卡请求: orderId={}, request={}", orderId, request);
-            
+
             GlobePayH5Response response = globePayService.createCreditCardPayment(orderId, globePayRequest);
-            
+
             if ("SUCCESS".equals(response.getReturnCode())) {
                 return CommonResult.success(response, "绑卡请求创建成功，请完成信用卡绑定");
             } else {
                 return CommonResult.failed(response.getReturnMsg());
             }
-            
+
         } catch (Exception e) {
             LOGGER.error("创建信用卡绑卡请求失败: ", e);
             return CommonResult.failed("创建绑卡请求失败: " + e.getMessage());
@@ -72,15 +72,15 @@ public class GlobePayController {
     public CommonResult<GlobePayH5Response> queryBindCardResult(@PathVariable("requestId") String requestId) {
         try {
             LOGGER.info("查询绑卡结果: requestId={}", requestId);
-            
+
             GlobePayH5Response response = globePayService.queryBindCardResult(requestId);
-            
+
             if ("SUCCESS".equals(response.getReturnCode())) {
                 return CommonResult.success(response, "绑卡结果查询成功");
             } else {
                 return CommonResult.failed(response.getReturnMsg());
             }
-            
+
         } catch (Exception e) {
             LOGGER.error("查询绑卡结果失败: requestId={}", requestId, e);
             return CommonResult.failed("查询绑卡结果失败: " + e.getMessage());
@@ -101,17 +101,17 @@ public class GlobePayController {
             globePayRequest.setPrice(request.getTotalAmount().intValue());
             globePayRequest.setChannel("CREDIT_CARD");
             globePayRequest.setNotifyUrl("http://localhost:8085/payment/h5/notify/globepay");
-            
+
             LOGGER.info("创建Token支付: orderId={}, memberToken={}, request={}", orderId, memberToken, request);
-            
+
             GlobePayH5Response response = globePayService.createTokenizedPayment(orderId, memberToken, globePayRequest);
-            
+
             if ("SUCCESS".equals(response.getReturnCode())) {
                 return CommonResult.success(response, "Token支付创建成功");
             } else {
                 return CommonResult.failed(response.getReturnMsg());
             }
-            
+
         } catch (Exception e) {
             LOGGER.error("创建Token支付失败: orderId={}, memberToken={}", orderId, memberToken, e);
             return CommonResult.failed("创建Token支付失败: " + e.getMessage());

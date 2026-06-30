@@ -6,12 +6,12 @@ import org.springframework.web.client.RestTemplate;
 
 /**
  * HTTP客户端配置
- * @author macrozheng
+ * @author dreaifekks
  * @date 2025/7/26
  */
 @Configuration
 public class HttpClientConfig {
-    
+
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();

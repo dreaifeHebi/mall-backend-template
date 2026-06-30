@@ -6,7 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 
 /**
  * GlobePay订单查询响应
- * @author macrozheng
+ * @author dreaifekks
  * @date 2025/9/28
  */
 @ApiModel("GlobePay订单查询响应")

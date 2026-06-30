@@ -16,28 +16,28 @@ import java.util.Map;
 
 /**
  * 退款日志服务实现类
- * @author macrozheng
+ * @author dreaifekks
  * @date 2025/10/13
  */
 @Service
 public class RefundLogServiceImpl implements RefundLogService {
-    
+
     private static final Logger LOGGER = LoggerFactory.getLogger(RefundLogServiceImpl.class);
-    
+
     @Autowired
     private RefundProcessLogDao refundProcessLogDao;
 
     @Override
-    public void recordLog(Long refundRequestId, String refundSn, RefundOperationType operationType, 
-                         String operationContent, String operationStatus, String requestData, 
+    public void recordLog(Long refundRequestId, String refundSn, RefundOperationType operationType,
+                         String operationContent, String operationStatus, String requestData,
                          String responseData, String errorMessage, Long operatorId, String operatorName) {
-        recordLog(refundRequestId, refundSn, operationType, operationContent, operationStatus, 
+        recordLog(refundRequestId, refundSn, operationType, operationContent, operationStatus,
                  requestData, responseData, errorMessage, operatorId, operatorName, null, null);
     }
 
     @Override
-    public void recordLog(Long refundRequestId, String refundSn, RefundOperationType operationType, 
-                         String operationContent, String operationStatus, String requestData, 
+    public void recordLog(Long refundRequestId, String refundSn, RefundOperationType operationType,
+                         String operationContent, String operationStatus, String requestData,
                          String responseData, String errorMessage, Long operatorId, String operatorName,
                          String operatorIp, Long processingTimeMs) {
         try {
@@ -56,7 +56,7 @@ public class RefundLogServiceImpl implements RefundLogService {
             log.setProcessingTimeMs(processingTimeMs);
             log.setOperationTime(new Date());
             log.setCreateTime(new Date());
-            
+
             refundProcessLogDao.insert(log);
         } catch (Exception e) {
             LOGGER.error("记录退款操作日志失败", e);
@@ -120,7 +120,7 @@ public class RefundLogServiceImpl implements RefundLogService {
             Calendar calendar = Calendar.getInstance();
             calendar.add(Calendar.DAY_OF_MONTH, -retentionDays);
             Date expireDate = calendar.getTime();
-            
+
             int deletedCount = refundProcessLogDao.deleteExpiredLogs(expireDate);
             LOGGER.info("清理过期退款日志完成，删除了 {} 条记录", deletedCount);
             return deletedCount;

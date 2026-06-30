@@ -18,14 +18,14 @@ import java.util.List;
 
 /**
  * 退款管理控制器（会员端）
- * @author macrozheng
+ * @author dreaifekks
  * @date 2025/7/27
  */
 @RestController
 @Api(tags = "MemberRefundController", description = "会员退款管理")
 @RequestMapping("/refund")
 public class MemberRefundController {
-    
+
     @Autowired
     private MemberRefundService memberRefundService;
 
@@ -55,7 +55,7 @@ public class MemberRefundController {
         UmsMember currentMember = memberService.getCurrentMember();
         CommonResult<List<RefundRequest>> result = memberRefundService.getMemberRefundList(
             currentMember.getId(), status, pageNum, pageSize);
-        
+
         if (result.getCode() == 200) {
             return CommonResult.success(CommonPage.restPage(result.getData()));
         }
@@ -80,7 +80,7 @@ public class MemberRefundController {
         if (detailResult.getCode() != 200) {
             return detailResult;
         }
-        
+
         return memberRefundService.queryRefundStatus(refundRequestId);
     }
 }

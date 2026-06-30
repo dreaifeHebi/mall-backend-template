@@ -8,7 +8,7 @@ import java.util.Date;
 
 /**
  * 支付记录实体类
- * @author macrozheng
+ * @author dreaifekks
  * @date 2025/7/26
  */
 @ApiModel("支付记录")

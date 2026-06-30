@@ -9,17 +9,17 @@ import org.springframework.stereotype.Component;
 
 /**
  * 退款状态查询定时任务
- * @author macrozheng
+ * @author dreaifekks
  * @date 2025/10/13
  */
 @Component
 public class RefundStatusQueryTask {
-    
+
     private static final Logger LOGGER = LoggerFactory.getLogger(RefundStatusQueryTask.class);
-    
+
     @Autowired
     private RefundService refundService;
-    
+
     /**
      * 每30分钟执行一次退款状态查询
      */

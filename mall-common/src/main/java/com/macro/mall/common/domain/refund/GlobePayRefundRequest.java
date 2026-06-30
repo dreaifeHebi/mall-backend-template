@@ -5,30 +5,30 @@ import io.swagger.annotations.ApiModelProperty;
 
 /**
  * GlobePay退款请求参数
- * @author macrozheng
+ * @author dreaifekks
  * @date 2025/7/27
  */
 @ApiModel(description = "GlobePay退款请求参数")
 public class GlobePayRefundRequest {
-    
+
     @ApiModelProperty(value = "商户订单号", required = true)
     private String merTransactionId;
-    
+
     @ApiModelProperty(value = "GlobePay交易号", required = true)
     private String transactionId;
-    
+
     @ApiModelProperty(value = "退款金额（分）", required = true)
     private Long refundAmount;
-    
+
     @ApiModelProperty(value = "原订单金额（分）", required = true)
     private Long orderAmount;
-    
+
     @ApiModelProperty(value = "退款原因")
     private String refundReason;
-    
+
     @ApiModelProperty(value = "退款单号")
     private String refundSn;
-    
+
     @ApiModelProperty(value = "通知地址")
     private String notifyUrl;
 
