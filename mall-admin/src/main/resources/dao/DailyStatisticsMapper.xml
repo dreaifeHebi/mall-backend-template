@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.macro.mall.mapper.DailyStatisticsMapper">
+    
+    <resultMap id="BaseResultMap" type="com.macro.mall.model.DailyStatistics">
+        <id column="id" jdbcType="BIGINT" property="id" />
+        <result column="statistics_date" jdbcType="DATE" property="statisticsDate" />
+        <result column="daily_sales" jdbcType="DECIMAL" property="dailySales" />
+        <result column="daily_order_count" jdbcType="BIGINT" property="dailyOrderCount" />
+        <result column="daily_new_users" jdbcType="BIGINT" property="dailyNewUsers" />
+        <result column="daily_completed_orders" jdbcType="BIGINT" property="dailyCompletedOrders" />
+        <result column="daily_cancelled_orders" jdbcType="BIGINT" property="dailyCancelledOrders" />
+        <result column="daily_avg_order_amount" jdbcType="DECIMAL" property="dailyAvgOrderAmount" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, statistics_date, daily_sales, daily_order_count, daily_new_users, 
+        daily_completed_orders, daily_cancelled_orders, daily_avg_order_amount, 
+        create_time, update_time
+    </sql>
+
+    <insert id="insert" parameterType="com.macro.mall.model.DailyStatistics" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO daily_statistics (
+            statistics_date, daily_sales, daily_order_count, daily_new_users,
+            daily_completed_orders, daily_cancelled_orders, daily_avg_order_amount,
+            create_time, update_time
+        ) VALUES (
+            #{statisticsDate,jdbcType=DATE}, 
+            #{dailySales,jdbcType=DECIMAL}, 
+            #{dailyOrderCount,jdbcType=BIGINT}, 
+            #{dailyNewUsers,jdbcType=BIGINT},
+            #{dailyCompletedOrders,jdbcType=BIGINT}, 
+            #{dailyCancelledOrders,jdbcType=BIGINT}, 
+            #{dailyAvgOrderAmount,jdbcType=DECIMAL},
+            #{createTime,jdbcType=TIMESTAMP}, 
+            #{updateTime,jdbcType=TIMESTAMP}
+        )
+    </insert>
+
+    <select id="selectByStatisticsDate" parameterType="java.util.Date" resultMap="BaseResultMap">
+        SELECT 
+        <include refid="Base_Column_List" />
+        FROM daily_statistics
+        WHERE statistics_date = #{statisticsDate,jdbcType=DATE}
+    </select>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.macro.mall.model.DailyStatistics">
+        UPDATE daily_statistics
+        <set>
+            <if test="statisticsDate != null">
+                statistics_date = #{statisticsDate,jdbcType=DATE},
+            </if>
+            <if test="dailySales != null">
+                daily_sales = #{dailySales,jdbcType=DECIMAL},
+            </if>
+            <if test="dailyOrderCount != null">
+                daily_order_count = #{dailyOrderCount,jdbcType=BIGINT},
+            </if>
+            <if test="dailyNewUsers != null">
+                daily_new_users = #{dailyNewUsers,jdbcType=BIGINT},
+            </if>
+            <if test="dailyCompletedOrders != null">
+                daily_completed_orders = #{dailyCompletedOrders,jdbcType=BIGINT},
+            </if>
+            <if test="dailyCancelledOrders != null">
+                daily_cancelled_orders = #{dailyCancelledOrders,jdbcType=BIGINT},
+            </if>
+            <if test="dailyAvgOrderAmount != null">
+                daily_avg_order_amount = #{dailyAvgOrderAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        WHERE id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByDateRange" resultMap="BaseResultMap">
+        SELECT 
+        <include refid="Base_Column_List" />
+        FROM daily_statistics
+        WHERE statistics_date BETWEEN #{startDate,jdbcType=DATE} AND #{endDate,jdbcType=DATE}
+        ORDER BY statistics_date ASC
+    </select>
+
+    <delete id="deleteByDateBefore" parameterType="java.util.Date">
+        DELETE FROM daily_statistics
+        WHERE statistics_date &lt; #{beforeDate,jdbcType=DATE}
+    </delete>
+
+</mapper>

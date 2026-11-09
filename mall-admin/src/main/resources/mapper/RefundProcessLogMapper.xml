@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.macro.mall.dao.refund.RefundProcessLogDao">
+    
+    <resultMap id="BaseResultMap" type="com.macro.mall.domain.refund.RefundProcessLog">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="refund_id" property="refundId" jdbcType="BIGINT"/>
+        <result column="refund_sn" property="refundSn" jdbcType="VARCHAR"/>
+        <result column="operation_type" property="operationType" jdbcType="VARCHAR"/>
+        <result column="operator_id" property="operatorId" jdbcType="BIGINT"/>
+        <result column="operator_name" property="operatorName" jdbcType="VARCHAR"/>
+        <result column="operation_result" property="operationResult" jdbcType="VARCHAR"/>
+        <result column="result_message" property="resultMessage" jdbcType="VARCHAR"/>
+        <result column="process_time_ms" property="processTimeMs" jdbcType="BIGINT"/>
+        <result column="third_party_response" property="thirdPartyResponse" jdbcType="LONGVARCHAR"/>
+        <result column="created_time" property="createdTime" jdbcType="TIMESTAMP"/>
+        <result column="note" property="note" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, refund_id, refund_sn, operation_type, operator_id, operator_name, 
+        operation_result, result_message, process_time_ms, third_party_response, 
+        created_time, note
+    </sql>
+
+    <!-- 基础查询 -->
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from oms_refund_process_log
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+
+    <!-- 插入 -->
+    <insert id="insert" parameterType="com.macro.mall.domain.refund.RefundProcessLog" useGeneratedKeys="true" keyProperty="id">
+        insert into oms_refund_process_log (
+            refund_id, refund_sn, operation_type, operator_id, operator_name,
+            operation_result, result_message, process_time_ms, third_party_response,
+            created_time, note
+        )
+        values (
+            #{refundId,jdbcType=BIGINT}, #{refundSn,jdbcType=VARCHAR}, #{operationType,jdbcType=VARCHAR},
+            #{operatorId,jdbcType=BIGINT}, #{operatorName,jdbcType=VARCHAR}, #{operationResult,jdbcType=VARCHAR},
+            #{resultMessage,jdbcType=VARCHAR}, #{processTimeMs,jdbcType=BIGINT}, #{thirdPartyResponse,jdbcType=LONGVARCHAR},
+            #{createdTime,jdbcType=TIMESTAMP}, #{note,jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <!-- 按退款ID查询 -->
+    <select id="selectByRefundId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from oms_refund_process_log
+        where refund_id = #{refundId,jdbcType=BIGINT}
+        order by created_time desc
+    </select>
+
+    <!-- 按退款单号查询 -->
+    <select id="selectByRefundSn" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from oms_refund_process_log
+        where refund_sn = #{refundSn,jdbcType=VARCHAR}
+        order by created_time desc
+    </select>
+
+    <!-- 按操作类型查询 -->
+    <select id="selectByOperationType" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from oms_refund_process_log
+        where operation_type = #{operationType,jdbcType=VARCHAR}
+        order by created_time desc
+    </select>
+
+    <!-- 按操作人查询 -->
+    <select id="selectByOperatorId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from oms_refund_process_log
+        where operator_id = #{operatorId,jdbcType=BIGINT}
+        order by created_time desc
+    </select>
+
+    <!-- 条件查询 -->
+    <select id="selectByCondition" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from oms_refund_process_log
+        <where>
+            <if test="refundId != null">
+                and refund_id = #{refundId,jdbcType=BIGINT}
+            </if>
+            <if test="refundSn != null and refundSn != ''">
+                and refund_sn = #{refundSn,jdbcType=VARCHAR}
+            </if>
+            <if test="operationType != null and operationType != ''">
+                and operation_type = #{operationType,jdbcType=VARCHAR}
+            </if>
+            <if test="operatorId != null">
+                and operator_id = #{operatorId,jdbcType=BIGINT}
+            </if>
+            <if test="operationResult != null and operationResult != ''">
+                and operation_result = #{operationResult,jdbcType=VARCHAR}
+            </if>
+            <if test="startDate != null">
+                and created_time &gt;= #{startDate,jdbcType=TIMESTAMP}
+            </if>
+            <if test="endDate != null">
+                and created_time &lt;= #{endDate,jdbcType=TIMESTAMP}
+            </if>
+        </where>
+        order by created_time desc
+    </select>
+
+    <!-- 统计查询 -->
+    <select id="countByOperationType" parameterType="java.lang.String" resultType="java.lang.Long">
+        select count(*)
+        from oms_refund_process_log
+        where operation_type = #{operationType,jdbcType=VARCHAR}
+    </select>
+
+    <select id="countByOperationResult" parameterType="java.lang.String" resultType="java.lang.Long">
+        select count(*)
+        from oms_refund_process_log
+        where operation_result = #{operationResult,jdbcType=VARCHAR}
+    </select>
+
+    <select id="countByCondition" parameterType="map" resultType="java.lang.Long">
+        select count(*)
+        from oms_refund_process_log
+        <where>
+            <if test="refundId != null">
+                and refund_id = #{refundId,jdbcType=BIGINT}
+            </if>
+            <if test="refundSn != null and refundSn != ''">
+                and refund_sn = #{refundSn,jdbcType=VARCHAR}
+            </if>
+            <if test="operationType != null and operationType != ''">
+                and operation_type = #{operationType,jdbcType=VARCHAR}
+            </if>
+            <if test="operatorId != null">
+                and operator_id = #{operatorId,jdbcType=BIGINT}
+            </if>
+            <if test="operationResult != null and operationResult != ''">
+                and operation_result = #{operationResult,jdbcType=VARCHAR}
+            </if>
+            <if test="startDate != null">
+                and created_time &gt;= #{startDate,jdbcType=TIMESTAMP}
+            </if>
+            <if test="endDate != null">
+                and created_time &lt;= #{endDate,jdbcType=TIMESTAMP}
+            </if>
+        </where>
+    </select>
+
+    <!-- 平均处理时间统计 -->
+    <select id="avgProcessTimeByOperationType" parameterType="java.lang.String" resultType="java.lang.Long">
+        select COALESCE(avg(process_time_ms), 0)
+        from oms_refund_process_log
+        where operation_type = #{operationType,jdbcType=VARCHAR}
+        and process_time_ms > 0
+    </select>
+
+    <!-- 删除 -->
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from oms_refund_process_log
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+
+    <delete id="deleteByRefundId" parameterType="java.lang.Long">
+        delete from oms_refund_process_log
+        where refund_id = #{refundId,jdbcType=BIGINT}
+    </delete>
+
+    <!-- 批量插入 -->
+    <insert id="batchInsert" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+        insert into oms_refund_process_log (
+            refund_id, refund_sn, operation_type, operator_id, operator_name,
+            operation_result, result_message, process_time_ms, third_party_response,
+            created_time, note
+        )
+        values
+        <foreach collection="list" item="item" separator=",">
+            (
+                #{item.refundId,jdbcType=BIGINT}, #{item.refundSn,jdbcType=VARCHAR}, #{item.operationType,jdbcType=VARCHAR},
+                #{item.operatorId,jdbcType=BIGINT}, #{item.operatorName,jdbcType=VARCHAR}, #{item.operationResult,jdbcType=VARCHAR},
+                #{item.resultMessage,jdbcType=VARCHAR}, #{item.processTimeMs,jdbcType=BIGINT}, #{item.thirdPartyResponse,jdbcType=LONGVARCHAR},
+                #{item.createdTime,jdbcType=TIMESTAMP}, #{item.note,jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+</mapper>

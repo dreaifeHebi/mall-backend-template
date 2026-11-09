@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>信用卡支付测试 - 四步流程</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1000px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            line-height: 1.6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+        
+        .header p {
+            margin: 10px 0 0;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .step { 
+            border: 2px solid #e9ecef;
+            padding: 25px; 
+            margin: 20px 0; 
+            border-radius: 12px;
+            background-color: #f8f9fa;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .step.active {
+            border-color: #667eea;
+            background-color: #f0f4ff;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+        }
+        
+        .step.completed {
+            border-color: #28a745;
+            background-color: #f0fff4;
+        }
+        
+        .step.error {
+            border-color: #dc3545;
+            background-color: #fff5f5;
+        }
+        
+        .step-number {
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .step.completed .step-number {
+            background: #28a745;
+        }
+        
+        .step.error .step-number {
+            background: #dc3545;
+        }
+        
+        .step h3 { 
+            color: #333; 
+            margin: 0 0 15px 0;
+            padding-left: 20px;
+        }
+        
+        .step p {
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        input, select { 
+            width: 100%;
+            padding: 12px; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            font-size: 14px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        button { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; 
+            padding: 12px 24px; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            margin: 5px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        button:disabled { 
+            background: #6c757d; 
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .result { 
+            margin: 15px 0; 
+            padding: 15px; 
+            border-radius: 8px; 
+            min-height: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+        
+        .success { 
+            background-color: #d4edda; 
+            color: #155724; 
+            border: 1px solid #c3e6cb; 
+        }
+        
+        .error { 
+            background-color: #f8d7da; 
+            color: #721c24; 
+            border: 1px solid #f5c6cb; 
+        }
+        
+        .info { 
+            background-color: #d1ecf1; 
+            color: #0c5460; 
+            border: 1px solid #bee5eb; 
+        }
+        
+        .warning { 
+            background-color: #fff3cd; 
+            color: #856404; 
+            border: 1px solid #ffeaa7; 
+        }
+        
+        pre { 
+            background-color: #f8f9fa; 
+            padding: 15px; 
+            border-radius: 8px; 
+            overflow-x: auto; 
+            font-size: 12px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background-color: #e9ecef;
+            border-radius: 3px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-pending { background: #ffc107; }
+        .status-success { background: #28a745; }
+        .status-error { background: #dc3545; }
+        .status-processing { 
+            background: #667eea; 
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏦 信用卡支付测试</h1>
+            <p>四步流程：创建订单 → 绑卡 → 查询 → 支付</p>
+        </div>
+        
+        <div class="content">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            
+            <!-- 步骤1: 创建订单 -->
+            <div class="step active" id="step1">
+                <div class="step-number">1</div>
+                <h3><span class="status-indicator status-pending" id="status1"></span>创建信用卡订单</h3>
+                <p>首先在GlobePay系统中创建一个信用卡支付订单</p>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>订单号:</label>
+                        <input type="text" id="orderId1" placeholder="自动生成" readonly>
+                        <button onclick="generateOrderId()" style="margin-top: 5px;">生成新订单号</button>
+                    </div>
+                    <div class="form-group">
+                        <label>订单描述:</label>
+                        <input type="text" id="description1" value="信用卡支付测试订单">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>金额(日元):</label>
+                        <input type="number" id="amount1" value="100" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>操作员:</label>
+                        <input type="text" id="operator1" value="test-user">
+                    </div>
+                </div>
+                
+                <button onclick="createOrder()" id="createOrderBtn">创建订单</button>
+                
+                <div id="step1Result" class="result"></div>
+            </div>
+            
+            <!-- 步骤2: 绑定信用卡 -->
+            <div class="step" id="step2">
+                <div class="step-number">2</div>
+                <h3><span class="status-indicator status-pending" id="status2"></span>绑定信用卡</h3>
+                <p>为订单绑定信用卡信息，获取支付token</p>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>订单号:</label>
+                        <input type="text" id="orderId2" placeholder="来自步骤1" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>卡号:</label>
+                        <input type="text" id="cardNo" value="4242424242424242" placeholder="测试卡号">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>CVV:</label>
+                        <input type="text" id="cvv" value="123" maxlength="4">
+                    </div>
+                    <div class="form-group">
+                        <label>有效期月:</label>
+                        <select id="expireMonth">
+                            <option value="12">12</option>
+                            <option value="01">01</option>
+                            <option value="02">02</option>
+                            <option value="03">03</option>
+                            <option value="04">04</option>
+                            <option value="05">05</option>
+                            <option value="06">06</option>
+                            <option value="07">07</option>
+                            <option value="08">08</option>
+                            <option value="09">09</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>有效期年:</label>
+                        <select id="expireYear">
+                            <option value="26">2026</option>
+                            <option value="25">2025</option>
+                            <option value="27">2027</option>
+                            <option value="28">2028</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>持卡人姓名:</label>
+                        <input type="text" id="cardholderName" value="Test User">
+                    </div>
+                </div>
+                
+                <button onclick="bindCard()" id="bindCardBtn" disabled>绑定信用卡</button>
+                
+                <div id="step2Result" class="result"></div>
+            </div>
+            
+            <!-- 步骤3: 查询订单状态 -->
+            <div class="step" id="step3">
+                <div class="step-number">3</div>
+                <h3><span class="status-indicator status-pending" id="status3"></span>查询订单状态</h3>
+                <p>查询订单当前状态和支付信息</p>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>订单号:</label>
+                        <input type="text" id="orderId3" placeholder="来自步骤1" readonly>
+                    </div>
+                </div>
+                
+                <button onclick="queryOrder()" id="queryOrderBtn" disabled>查询订单</button>
+                
+                <div id="step3Result" class="result"></div>
+            </div>
+            
+            <!-- 步骤4: 执行支付 -->
+            <div class="step" id="step4">
+                <div class="step-number">4</div>
+                <h3><span class="status-indicator status-pending" id="status4"></span>执行支付</h3>
+                <p>使用绑定的信用卡完成实际支付</p>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>订单号:</label>
+                        <input type="text" id="orderId4" placeholder="来自步骤1" readonly>
+                    </div>
+                </div>
+                
+                <button onclick="executePayment()" id="executePaymentBtn" disabled>执行支付</button>
+                
+                <div id="step4Result" class="result"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentOrderId = '';
+        let currentStep = 1;
+        
+        // 生成订单号
+        function generateOrderId() {
+            const timestamp = Date.now();
+            currentOrderId = 'CC4S' + timestamp;
+            document.getElementById('orderId1').value = currentOrderId;
+            updateProgress();
+        }
+        
+        // 更新进度条
+        function updateProgress() {
+            const progress = (currentStep - 1) * 25;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+        
+        // 更新步骤状态
+        function updateStepStatus(stepNum, status) {
+            const step = document.getElementById('step' + stepNum);
+            const statusIndicator = document.getElementById('status' + stepNum);
+            
+            // 移除之前的状态类
+            step.classList.remove('active', 'completed', 'error');
+            statusIndicator.classList.remove('status-pending', 'status-processing', 'status-success', 'status-error');
+            
+            // 添加新状态
+            if (status === 'processing') {
+                step.classList.add('active');
+                statusIndicator.classList.add('status-processing');
+            } else if (status === 'success') {
+                step.classList.add('completed');
+                statusIndicator.classList.add('status-success');
+            } else if (status === 'error') {
+                step.classList.add('error');
+                statusIndicator.classList.add('status-error');
+            } else {
+                statusIndicator.classList.add('status-pending');
+            }
+        }
+        
+        // 激活下一步
+        function activateNextStep(stepNum) {
+            // 更新当前步骤为成功
+            updateStepStatus(stepNum, 'success');
+            
+            // 激活下一步
+            if (stepNum < 4) {
+                currentStep = stepNum + 1;
+                updateProgress();
+                
+                // 启用下一步的按钮
+                const nextBtn = document.getElementById(getButtonId(currentStep));
+                if (nextBtn) nextBtn.disabled = false;
+                
+                // 复制订单号到下一步
+                copyOrderToNextStep(stepNum);
+            }
+        }
+        
+        function getButtonId(step) {
+            const buttons = ['', 'createOrderBtn', 'bindCardBtn', 'queryOrderBtn', 'executePaymentBtn'];
+            return buttons[step];
+        }
+        
+        function copyOrderToNextStep(fromStep) {
+            if (fromStep < 4) {
+                const nextOrderInput = document.getElementById('orderId' + (fromStep + 1));
+                if (nextOrderInput) {
+                    nextOrderInput.value = currentOrderId;
+                }
+            }
+        }
+        
+        // 显示结果
+        function showResult(stepNum, data, isSuccess = true) {
+            const resultDiv = document.getElementById('step' + stepNum + 'Result');
+            resultDiv.className = 'result ' + (isSuccess ? 'success' : 'error');
+            
+            if (typeof data === 'string') {
+                resultDiv.innerHTML = '<pre>' + data + '</pre>';
+            } else {
+                resultDiv.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            }
+        }
+        
+        // 步骤1: 创建订单
+        function createOrder() {
+            if (!currentOrderId) {
+                alert('请先生成订单号');
+                return;
+            }
+            
+            updateStepStatus(1, 'processing');
+            
+            const requestData = {
+                orderId: currentOrderId,
+                description: document.getElementById('description1').value,
+                price: parseInt(document.getElementById('amount1').value),
+                operator: document.getElementById('operator1').value,
+                notifyUrl: window.location.origin + '/h5-payment/globe-pay/notify'
+            };
+            
+            fetch('/h5-payment/globe-pay/credit-card', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('步骤1响应:', data);
+                showResult(1, data, data.returnCode === 'SUCCESS');
+                
+                if (data.returnCode === 'SUCCESS') {
+                    activateNextStep(1);
+                } else {
+                    updateStepStatus(1, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('步骤1错误:', error);
+                showResult(1, 'Error: ' + error.message, false);
+                updateStepStatus(1, 'error');
+            });
+        }
+        
+        // 步骤2: 绑定信用卡
+        function bindCard() {
+            updateStepStatus(2, 'processing');
+            
+            // 模拟绑卡过程（实际上由后端四步流程中的第二步完成）
+            setTimeout(() => {
+                const mockResponse = {
+                    returnCode: 'SUCCESS',
+                    returnMsg: '信用卡绑定成功',
+                    token: 'mock_token_' + Date.now()
+                };
+                
+                showResult(2, mockResponse, true);
+                activateNextStep(2);
+            }, 1000);
+        }
+        
+        // 步骤3: 查询订单
+        function queryOrder() {
+            updateStepStatus(3, 'processing');
+            
+            // 模拟查询过程
+            setTimeout(() => {
+                const mockResponse = {
+                    returnCode: 'SUCCESS',
+                    returnMsg: '订单查询成功',
+                    status: 'card_bound',
+                    orderId: currentOrderId
+                };
+                
+                showResult(3, mockResponse, true);
+                activateNextStep(3);
+            }, 800);
+        }
+        
+        // 步骤4: 执行支付
+        function executePayment() {
+            updateStepStatus(4, 'processing');
+            
+            // 模拟支付过程
+            setTimeout(() => {
+                const mockResponse = {
+                    returnCode: 'SUCCESS',
+                    returnMsg: '支付执行成功',
+                    transactionId: 'txn_' + Date.now(),
+                    orderId: currentOrderId
+                };
+                
+                showResult(4, mockResponse, true);
+                updateStepStatus(4, 'success');
+                currentStep = 5;
+                updateProgress();
+            }, 1500);
+        }
+        
+        // 页面加载时生成订单号
+        window.onload = function() {
+            generateOrderId();
+        };
+    </script>
+</body>
+</html>

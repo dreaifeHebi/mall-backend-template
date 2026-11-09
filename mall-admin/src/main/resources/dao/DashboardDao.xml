@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.macro.mall.dao.DashboardDao">
+
+    <!-- 今日订单数 -->
+    <select id="getTodayOrderCount" resultType="Integer">
+        SELECT COUNT(*) FROM oms_order 
+        WHERE delete_status = 0 
+        AND DATE(create_time) = CURRENT_DATE
+    </select>
+
+    <!-- 今日订单金额(分) -->
+    <select id="getTodayOrderAmount" resultType="Long">
+        SELECT COALESCE(SUM(total_amount * 100), 0) FROM oms_order 
+        WHERE delete_status = 0 
+        AND DATE(create_time) = CURRENT_DATE
+    </select>
+
+    <!-- 总用户数 -->
+    <select id="getTotalUserCount" resultType="Integer">
+        SELECT COUNT(*) FROM ums_member WHERE status = 1
+    </select>
+
+    <!-- 总商品数 -->
+    <select id="getTotalProductCount" resultType="Integer">
+        SELECT COUNT(*) FROM pms_product WHERE delete_status = 0
+    </select>
+
+    <!-- 本月订单数 -->
+    <select id="getMonthOrderCount" resultType="Integer">
+        SELECT COUNT(*) FROM oms_order 
+        WHERE delete_status = 0 
+        AND date_trunc('month', create_time) = date_trunc('month', NOW())
+    </select>
+
+    <!-- 本月订单金额(分) -->
+    <select id="getMonthOrderAmount" resultType="Long">
+        SELECT COALESCE(SUM(total_amount * 100), 0) FROM oms_order 
+        WHERE delete_status = 0 
+        AND date_trunc('month', create_time) = date_trunc('month', NOW())
+    </select>
+
+    <!-- 待付款订单数 -->
+    <select id="getPendingPaymentCount" resultType="Integer">
+        SELECT COUNT(*) FROM oms_order 
+        WHERE delete_status = 0 AND status = 0
+    </select>
+
+    <!-- 已完成订单数 -->
+    <select id="getCompletedOrderCount" resultType="Integer">
+        SELECT COUNT(*) FROM oms_order 
+        WHERE delete_status = 0 AND status = 3
+    </select>
+
+    <!-- 待收货订单数 -->
+    <select id="getPendingReceiveCount" resultType="Integer">
+        SELECT COUNT(*) FROM oms_order 
+        WHERE delete_status = 0 AND status = 2
+    </select>
+
+    <!-- 待发货订单数 -->
+    <select id="getPendingShipmentCount" resultType="Integer">
+        SELECT COUNT(*) FROM oms_order 
+        WHERE delete_status = 0 AND status = 1
+    </select>
+
+    <!-- 缺货商品数 -->
+    <select id="getStockOutCount" resultType="Integer">
+        SELECT COUNT(*) FROM pms_product 
+        WHERE delete_status = 0 AND stock = 0
+    </select>
+
+    <!-- 待退款订单数 -->
+    <select id="getPendingRefundCount" resultType="Integer">
+        SELECT COUNT(*) FROM oms_order_return_apply 
+        WHERE status = 1
+    </select>
+
+    <!-- 已发货订单数 -->
+    <select id="getShippedOrderCount" resultType="Integer">
+        SELECT COUNT(*) FROM oms_order 
+        WHERE delete_status = 0 AND status = 2
+    </select>
+
+    <!-- 待退货订单数 -->
+    <select id="getPendingReturnCount" resultType="Integer">
+        SELECT COUNT(*) FROM oms_order_return_apply 
+        WHERE status = 0
+    </select>
+
+    <!-- 下架商品数 -->
+    <select id="getProductOfflineCount" resultType="Integer">
+        SELECT COUNT(*) FROM pms_product 
+        WHERE delete_status = 0 AND publish_status = 0
+    </select>
+
+    <!-- 上架商品数 -->
+    <select id="getProductOnlineCount" resultType="Integer">
+        SELECT COUNT(*) FROM pms_product 
+        WHERE delete_status = 0 AND publish_status = 1
+    </select>
+
+    <!-- 库存不足商品数 -->
+    <select id="getProductLowStockCount" resultType="Integer">
+        SELECT COUNT(*) FROM pms_product 
+        WHERE delete_status = 0 AND stock &lt; low_stock
+    </select>
+
+    <!-- 今日新增用户数 -->
+    <select id="getTodayNewUserCount" resultType="Integer">
+        SELECT COUNT(*) FROM ums_member 
+        WHERE DATE(create_time) = CURRENT_DATE
+    </select>
+
+    <!-- 昨日新增用户数 -->
+    <select id="getYesterdayNewUserCount" resultType="Integer">
+        SELECT COUNT(*) FROM ums_member 
+        WHERE DATE(create_time) = CURRENT_DATE - 1
+    </select>
+
+    <!-- 本月新增用户数 -->
+    <select id="getMonthNewUserCount" resultType="Integer">
+        SELECT COUNT(*) FROM ums_member 
+        WHERE date_trunc('month', create_time) = date_trunc('month', NOW())
+    </select>
+
+    <!-- 本周订单数 -->
+    <select id="getWeekOrderCount" resultType="Integer">
+        SELECT COUNT(*) FROM oms_order 
+        WHERE delete_status = 0 
+        AND date_trunc('week', create_time) = date_trunc('week', NOW())
+    </select>
+
+    <!-- 本周订单金额(分) -->
+    <select id="getWeekOrderAmount" resultType="Long">
+        SELECT COALESCE(SUM(total_amount * 100), 0) FROM oms_order 
+        WHERE delete_status = 0 
+        AND date_trunc('week', create_time) = date_trunc('week', NOW())
+    </select>
+
+    <!-- 上月订单数 -->
+    <select id="getLastMonthOrderCount" resultType="Integer">
+        SELECT COUNT(*) FROM oms_order 
+        WHERE delete_status = 0 
+        AND date_trunc('month', create_time) = date_trunc('month', NOW() - INTERVAL '1 month')
+    </select>
+
+    <!-- 上月订单金额(分) -->
+    <select id="getLastMonthOrderAmount" resultType="Long">
+        SELECT COALESCE(SUM(total_amount * 100), 0) FROM oms_order 
+        WHERE delete_status = 0 
+        AND date_trunc('month', create_time) = date_trunc('month', NOW() - INTERVAL '1 month')
+    </select>
+
+    <!-- 上周订单数 -->
+    <select id="getLastWeekOrderCount" resultType="Integer">
+        SELECT COUNT(*) FROM oms_order 
+        WHERE delete_status = 0 
+        AND date_trunc('week', create_time) = date_trunc('week', NOW() - INTERVAL '1 week')
+    </select>
+
+    <!-- 上周订单金额(分) -->
+    <select id="getLastWeekOrderAmount" resultType="Long">
+        SELECT COALESCE(SUM(total_amount * 100), 0) FROM oms_order 
+        WHERE delete_status = 0 
+        AND date_trunc('week', create_time) = date_trunc('week', NOW() - INTERVAL '1 week')
+    </select>
+
+</mapper>

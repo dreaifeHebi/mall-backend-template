@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.macro.mall.portal.dao.PaymentRecordMapper">
+  
+  <!-- 结果映射 -->
+  <resultMap id="BaseResultMap" type="com.macro.mall.portal.domain.payment.PaymentRecord">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="order_id" jdbcType="BIGINT" property="orderId" />
+    <result column="order_sn" jdbcType="VARCHAR" property="orderSn" />
+    <result column="payment_channel" jdbcType="VARCHAR" property="paymentChannel" />
+    <result column="payment_method" jdbcType="VARCHAR" property="paymentMethod" />
+    <result column="payment_amount" jdbcType="DECIMAL" property="paymentAmount" />
+    <result column="currency" jdbcType="VARCHAR" property="currency" />
+    <result column="payment_status" jdbcType="VARCHAR" property="paymentStatus" />
+    <result column="third_party_order_id" jdbcType="VARCHAR" property="thirdPartyOrderId" />
+    <result column="third_party_trade_no" jdbcType="VARCHAR" property="thirdPartyTradeNo" />
+    <result column="payment_url" jdbcType="VARCHAR" property="paymentUrl" />
+    <result column="qr_code_url" jdbcType="VARCHAR" property="qrCodeUrl" />
+    <result column="request_params" jdbcType="LONGVARCHAR" property="requestParams" />
+    <result column="payment_response" jdbcType="LONGVARCHAR" property="paymentResponse" />
+    <result column="notify_response" jdbcType="LONGVARCHAR" property="notifyResponse" />
+    <result column="failure_reason" jdbcType="VARCHAR" property="failureReason" />
+    <result column="payment_time" jdbcType="TIMESTAMP" property="paymentTime" />
+    <result column="notify_time" jdbcType="TIMESTAMP" property="notifyTime" />
+    <result column="expire_time" jdbcType="TIMESTAMP" property="expireTime" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+
+  <!-- 基础字段 -->
+  <sql id="Base_Column_List">
+    id, order_id, order_sn, payment_channel, payment_method, payment_amount, currency,
+    payment_status, third_party_order_id, third_party_trade_no, payment_url, qr_code_url,
+    request_params, payment_response, notify_response, failure_reason, payment_time,
+    notify_time, expire_time, create_time, update_time
+  </sql>
+
+  <!-- 插入支付记录 -->
+  <insert id="insert" parameterType="com.macro.mall.portal.domain.payment.PaymentRecord" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO oms_payment_record (
+      order_id, order_sn, payment_channel, payment_method, payment_amount, currency,
+      payment_status, third_party_order_id, third_party_trade_no, payment_url, qr_code_url,
+      request_params, payment_response, notify_response, failure_reason, payment_time,
+      notify_time, expire_time, create_time, update_time
+    ) VALUES (
+      #{orderId,jdbcType=BIGINT}, #{orderSn,jdbcType=VARCHAR}, #{paymentChannel,jdbcType=VARCHAR},
+      #{paymentMethod,jdbcType=VARCHAR}, #{paymentAmount,jdbcType=DECIMAL}, #{currency,jdbcType=VARCHAR},
+      #{paymentStatus,jdbcType=VARCHAR}, #{thirdPartyOrderId,jdbcType=VARCHAR}, #{thirdPartyTradeNo,jdbcType=VARCHAR},
+      #{paymentUrl,jdbcType=VARCHAR}, #{qrCodeUrl,jdbcType=VARCHAR}, #{requestParams,jdbcType=LONGVARCHAR},
+      #{paymentResponse,jdbcType=LONGVARCHAR}, #{notifyResponse,jdbcType=LONGVARCHAR}, #{failureReason,jdbcType=VARCHAR},
+      #{paymentTime,jdbcType=TIMESTAMP}, #{notifyTime,jdbcType=TIMESTAMP}, #{expireTime,jdbcType=TIMESTAMP},
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+    )
+  </insert>
+
+  <!-- 根据主键更新 -->
+  <update id="updateByPrimaryKey" parameterType="com.macro.mall.portal.domain.payment.PaymentRecord">
+    UPDATE oms_payment_record
+    SET order_id = #{orderId,jdbcType=BIGINT},
+        order_sn = #{orderSn,jdbcType=VARCHAR},
+        payment_channel = #{paymentChannel,jdbcType=VARCHAR},
+        payment_method = #{paymentMethod,jdbcType=VARCHAR},
+        payment_amount = #{paymentAmount,jdbcType=DECIMAL},
+        currency = #{currency,jdbcType=VARCHAR},
+        payment_status = #{paymentStatus,jdbcType=VARCHAR},
+        third_party_order_id = #{thirdPartyOrderId,jdbcType=VARCHAR},
+        third_party_trade_no = #{thirdPartyTradeNo,jdbcType=VARCHAR},
+        payment_url = #{paymentUrl,jdbcType=VARCHAR},
+        qr_code_url = #{qrCodeUrl,jdbcType=VARCHAR},
+        request_params = #{requestParams,jdbcType=LONGVARCHAR},
+        payment_response = #{paymentResponse,jdbcType=LONGVARCHAR},
+        notify_response = #{notifyResponse,jdbcType=LONGVARCHAR},
+        failure_reason = #{failureReason,jdbcType=VARCHAR},
+        payment_time = #{paymentTime,jdbcType=TIMESTAMP},
+        notify_time = #{notifyTime,jdbcType=TIMESTAMP},
+        expire_time = #{expireTime,jdbcType=TIMESTAMP},
+        update_time = NOW()
+    WHERE id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <!-- 根据主键查询 -->
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    SELECT <include refid="Base_Column_List" />
+    FROM oms_payment_record
+    WHERE id = #{id,jdbcType=BIGINT}
+  </select>
+
+  <!-- 根据订单号和支付渠道查询 -->
+  <select id="selectByOrderSnAndChannel" resultMap="BaseResultMap">
+    SELECT <include refid="Base_Column_List" />
+    FROM oms_payment_record
+    WHERE order_sn = #{orderSn,jdbcType=VARCHAR}
+      AND payment_channel = #{paymentChannel,jdbcType=VARCHAR}
+    ORDER BY create_time DESC
+    LIMIT 1
+  </select>
+
+  <!-- 根据订单ID查询支付记录列表 -->
+  <select id="selectByOrderId" resultMap="BaseResultMap">
+    SELECT <include refid="Base_Column_List" />
+    FROM oms_payment_record
+    WHERE order_id = #{orderId,jdbcType=BIGINT}
+    ORDER BY create_time DESC
+  </select>
+
+  <!-- 根据第三方订单号查询 -->
+  <select id="selectByThirdPartyOrderId" resultMap="BaseResultMap">
+    SELECT <include refid="Base_Column_List" />
+    FROM oms_payment_record
+    WHERE third_party_order_id = #{thirdPartyOrderId,jdbcType=VARCHAR}
+    ORDER BY create_time DESC
+    LIMIT 1
+  </select>
+
+  <!-- 根据支付状态查询 -->
+  <select id="selectByPaymentStatus" resultMap="BaseResultMap">
+    SELECT <include refid="Base_Column_List" />
+    FROM oms_payment_record
+    WHERE payment_status = #{paymentStatus,jdbcType=VARCHAR}
+    ORDER BY create_time DESC
+  </select>
+
+  <!-- 更新支付状态 -->
+  <update id="updatePaymentStatus">
+    UPDATE oms_payment_record
+    SET payment_status = #{paymentStatus,jdbcType=VARCHAR},
+        payment_time = #{paymentTime,jdbcType=VARCHAR},
+        update_time = NOW()
+    WHERE id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <!-- 更新第三方信息 -->
+  <update id="updateThirdPartyInfo">
+    UPDATE oms_payment_record
+    SET third_party_order_id = #{thirdPartyOrderId,jdbcType=VARCHAR},
+        third_party_trade_no = #{thirdPartyTradeNo,jdbcType=VARCHAR},
+        payment_response = #{paymentResponse,jdbcType=LONGVARCHAR},
+        update_time = NOW()
+    WHERE id = #{id,jdbcType=BIGINT}
+  </update>
+
+</mapper>

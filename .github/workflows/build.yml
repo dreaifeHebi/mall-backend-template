@@ -1,0 +1,44 @@
+name: Build Backend
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "mall-common/**"
+      - "mall-mbg/**"
+      - "mall-security/**"
+      - "mall-admin/**"
+      - "mall-portal/**"
+      - "pom.xml"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "8"
+          cache: maven
+
+      - name: Build core modules
+        run: mvn -B -DskipTests package -pl mall-admin,mall-portal -am
+
+      - name: Prepare deployment artifacts
+        run: |
+          mkdir -p dist
+          cp "$(ls mall-admin/target/*.jar | grep -v original | head -n 1)" dist/mall-admin.jar
+          cp "$(ls mall-portal/target/*.jar | grep -v original | head -n 1)" dist/mall-portal.jar
+
+      - name: Upload jars
+        uses: actions/upload-artifact@v4
+        with:
+          name: mall-backend-jars
+          path: dist/*.jar

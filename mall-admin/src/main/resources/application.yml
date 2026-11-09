@@ -1,0 +1,102 @@
+spring:
+  application:
+    name: mall-admin
+  profiles:
+    active: dev #默认为开发环境
+  servlet:
+    multipart:
+      enabled: true #开启文件上传
+      max-file-size: 10MB #限制文件上传大小为10M
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+server:
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+logging:
+  charset:
+    console: UTF-8
+    file: UTF-8
+
+mybatis:
+  mapper-locations:
+    - classpath:dao/*.xml
+    - classpath*:com/**/mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+
+pagehelper:
+  helperDialect: postgresql
+  reasonable: true
+  supportMethodsArguments: true
+
+jwt:
+  tokenHeader: Authorization #JWT存储的请求头
+  secret: mall-admin-secret #JWT加解密使用的密钥
+  expiration: 604800 #JWT的超期限时间(60*60*24*7)
+  tokenHead: 'Bearer '  #JWT负载中拿到开头
+
+redis:
+  database: mall
+  key:
+    admin: 'ums:admin'
+    resourceList: 'ums:resourceList'
+  expire:
+    common: 86400 # 24小时
+
+secure:
+  ignored:
+    urls: #安全路径白名单
+      - /swagger-ui/
+      - /swagger-resources/**
+      - /**/v2/api-docs
+      - /**/*.html
+      - /**/*.js
+      - /**/*.css
+      - /**/*.png
+      - /**/*.map
+      - /favicon.ico
+      - /actuator/**
+      - /druid/**
+      - /admin/login
+      - /admin/register
+      - /admin/info
+      - /admin/logout
+      - /minio/upload
+      - /uploads/**
+      - /smsEmailTemplate/**
+      - /statistics/**
+      - /admin/customerService/**
+      - /admin/homeDashboard
+      - /batch/**
+      - /admin/refund/member/**
+
+mall:
+  upload:
+    path: ${MALL_UPLOAD_PATH:${user.dir}/uploads} # 文件上传路径
+    url: ${MALL_UPLOAD_URL:/uploads} # 文件访问路径
+  domain: ${MALL_DOMAIN:http://localhost:8080} # 访问域名
+  csv:
+    order-file-prefix: Order # CSV文件名前缀
+    file-suffix: .csv # CSV文件后缀
+    encoding: UTF-8 # 字符编码
+    delimiter: "," # 分隔符
+    line-break: "\r\n" # 换行符（CRLF）
+    wrapper: "\"" # 字段包裹符
+    header-identifier: START # 头部标识符
+    footer-identifier: END # 尾部标识符
+
+# 前端配置
+frontend:
+  base-url: http://localhost:8060 # 前端基础URL
+  order-detail-path: "/#/pages/order/orderDetail" # 订单详情页面路径

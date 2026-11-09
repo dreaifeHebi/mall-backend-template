@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>H5支付测试页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .payment-method {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .payment-method:hover {
+            background-color: #f0f8ff;
+            border-color: #007bff;
+        }
+        .payment-method.selected {
+            background-color: #e3f2fd;
+            border-color: #007bff;
+        }
+        .payment-method img {
+            width: 30px;
+            height: 30px;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .order-info {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .credit-card-info {
+            display: none;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+            background-color: #fafafa;
+        }
+        .status-check {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>H5支付测试</h2>
+        
+        <div class="order-info">
+            <h3>订单信息</h3>
+            <p>订单号：<span id="orderSn">ORDER_20250126_001</span></p>
+            <p>订单金额：¥<span id="amount">100.50</span></p>
+            <p>商品名称：<span id="subject">商品购买测试</span></p>
+        </div>
+
+        <h3>选择支付方式</h3>
+        <div id="payment-methods">
+            <div class="payment-method" onclick="selectPaymentMethod('ALIPAY_H5')">
+                <span>🟡</span>
+                <span>支付宝H5支付</span>
+                <p style="margin: 5px 0; color: #666;">支付宝手机网站支付，适用于移动端浏览器</p>
+            </div>
+            
+            <div class="payment-method" onclick="selectPaymentMethod('WECHAT_H5')">
+                <span>🟢</span>
+                <span>微信H5支付</span>
+                <p style="margin: 5px 0; color: #666;">微信手机网站支付，适用于移动端浏览器</p>
+            </div>
+            
+            <div class="payment-method" onclick="selectPaymentMethod('CREDIT_CARD')">
+                <span>💳</span>
+                <span>信用卡支付</span>
+                <p style="margin: 5px 0; color: #666;">国际信用卡支付，支持Visa、MasterCard等</p>
+            </div>
+        </div>
+
+        <div id="credit-card-info" class="credit-card-info">
+            <h4>🏦 信用卡支付流程</h4>
+            <p style="color: #666; margin-bottom: 15px; font-size: 14px;">
+                信用卡支付采用安全的tokenize模式，点击"确认支付"后将自动完成以下流程：<br>
+                1️⃣ 自动跳转到信用卡绑定页面 → 2️⃣ 绑定完成后自动检测 → 3️⃣ 自动完成支付
+            </p>
+            
+            <!-- 支付状态显示 -->
+            <div id="credit-card-status" style="border: 1px solid #e0e0e0; padding: 15px; border-radius: 5px; display: none;">
+                <h5>� 信用卡支付状态</h5>
+                <div id="payment-status-info" style="margin-top: 10px; font-family: monospace; font-size: 12px;"></div>
+                <div id="countdown-info" style="margin-top: 10px; color: #666; font-size: 11px;"></div>
+            </div>
+        </div>
+
+        <button onclick="confirmPayment()">确认支付</button>
+
+        <div id="status-check" class="status-check">
+            <div class="spinner"></div>
+            <p>正在处理支付，请稍候...</p>
+            <button onclick="checkPaymentStatus()">查询支付状态</button>
+            <button onclick="cancelPayment()" style="background-color: #dc3545; margin-top: 10px;">取消支付</button>
+        </div>
+    </div>
+
+    <script>
+        let selectedPaymentChannel = '';
+        let currentOrderSn = '';
+        let statusCheckInterval = null;
+        
+        // 信用卡tokenize支付相关变量
+        let currentBindOrderId = '';
+        let currentMemberToken = '';
+        let tokenPayOrderId = '';
+        
+        // 轮询相关变量
+        let bindCardPollingInterval = null;
+        let pollingAttempts = 0;
+        let maxPollingAttempts = 6; // 最多轮询6次 (1+2+4+8+16+32 = 63秒)
+
+        const orderInfo = {
+            orderId: 123456,
+            orderSn: 'ORDER_' + Date.now(),
+            totalAmount: 100.50,
+            subject: '商品购买测试',
+            currency: 'JPY'
+        };
+
+        // 更新页面显示的订单信息
+        document.getElementById('orderSn').textContent = orderInfo.orderSn;
+        document.getElementById('amount').textContent = orderInfo.totalAmount;
+        document.getElementById('subject').textContent = orderInfo.subject;
+
+        // 页面加载时检查URL参数，看是否是从绑卡页面返回
+        window.addEventListener('DOMContentLoaded', function() {
+            checkIfReturnFromBindCard();
+        });
+
+        // 选择支付方式
+        function selectPaymentMethod(methodCode) {
+            selectedPaymentChannel = methodCode;
+            
+            // 更新选中状态
+            document.querySelectorAll('.payment-method').forEach(el => 
+                el.classList.remove('selected'));
+            event.target.closest('.payment-method').classList.add('selected');
+            
+            // 显示/隐藏信用卡信息
+            const creditCardInfo = document.getElementById('credit-card-info');
+            if (methodCode === 'CREDIT_CARD') {
+                creditCardInfo.style.display = 'block';
+            } else {
+                creditCardInfo.style.display = 'none';
+            }
+        }
+
+        // 确认支付
+        async function confirmPayment() {
+            if (!selectedPaymentChannel) {
+                alert('请选择支付方式');
+                return;
+            }
+
+            // 如果是信用卡支付，直接跳转到绑卡页面
+            if (selectedPaymentChannel === 'CREDIT_CARD') {
+                await redirectToCreditCardBind();
+                return;
+            }
+
+            // 其他支付方式使用原有逻辑
+            const paymentData = {
+                ...orderInfo,
+                paymentChannel: selectedPaymentChannel
+            };
+
+            try {
+                const response = await fetch('/portal/payment/h5/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(paymentData)
+                });
+
+                const result = await response.json();
+
+                if (result.code === 200 && result.data.success) {
+                    currentOrderSn = result.data.orderSn;
+                    
+                    // 显示处理状态
+                    document.getElementById('status-check').style.display = 'block';
+                    
+                    // 模拟跳转到支付页面（实际应该跳转到 result.data.paymentUrl）
+                    console.log('支付URL:', result.data.paymentUrl);
+                    alert('支付订单创建成功！模拟跳转到支付页面：' + result.data.paymentUrl);
+                    
+                    // 开始轮询支付状态
+                    startStatusCheck();
+                } else {
+                    alert('支付创建失败：' + (result.data?.errorMessage || result.message));
+                }
+            } catch (error) {
+                console.error('支付请求失败:', error);
+                alert('支付请求失败：' + error.message);
+            }
+        }
+
+        // 开始状态检查
+        function startStatusCheck() {
+            statusCheckInterval = setInterval(checkPaymentStatus, 3000);
+        }
+
+        // 停止状态检查
+        function stopStatusCheck() {
+            if (statusCheckInterval) {
+                clearInterval(statusCheckInterval);
+                statusCheckInterval = null;
+            }
+        }
+
+        // 查询支付状态
+        async function checkPaymentStatus() {
+            if (!currentOrderSn || !selectedPaymentChannel) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/portal/payment/h5/status/${currentOrderSn}/${selectedPaymentChannel}`);
+                const result = await response.json();
+
+                if (result.code === 200 && result.data) {
+                    const status = result.data.paymentStatus;
+                    
+                    switch (status) {
+                        case 'SUCCESS':
+                            stopStatusCheck();
+                            alert('支付成功！');
+                            // 可以跳转到成功页面
+                            // window.location.href = '/portal/payment/test/success';
+                            break;
+                        case 'FAILED':
+                            stopStatusCheck();
+                            alert('支付失败，请重新支付');
+                            document.getElementById('status-check').style.display = 'none';
+                            break;
+                        case 'CANCELLED':
+                            stopStatusCheck();
+                            alert('支付已取消');
+                            document.getElementById('status-check').style.display = 'none';
+                            break;
+                        case 'PENDING':
+                            console.log('支付状态：待支付');
+                            break;
+                    }
+                }
+            } catch (error) {
+                console.error('查询支付状态失败:', error);
+            }
+        }
+
+        // 取消支付
+        async function cancelPayment() {
+            if (!currentOrderSn || !selectedPaymentChannel) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/portal/payment/h5/cancel', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `orderSn=${currentOrderSn}&paymentChannel=${selectedPaymentChannel}`
+                });
+
+                const result = await response.json();
+
+                if (result.code === 200 && result.data) {
+                    stopStatusCheck();
+                    alert('取消支付成功');
+                    document.getElementById('status-check').style.display = 'none';
+                } else {
+                    alert('取消支付失败：' + result.message);
+                }
+            } catch (error) {
+                console.error('取消支付失败:', error);
+                alert('取消支付失败：' + error.message);
+            }
+        }
+
+        // 页面离开时停止状态检查
+        window.addEventListener('beforeunload', () => {
+            stopStatusCheck();
+            stopBindCardPolling();
+        });
+        
+        // ========== 信用卡直接跳转支付流程 ==========
+        
+        // 跳转到信用卡绑卡页面
+        async function redirectToCreditCardBind() {
+            // 1. 创建绑卡请求
+            const bindResult = await createBindCardRequest();
+            if (!bindResult.success) {
+                alert('❌ 绑卡请求创建失败: ' + bindResult.error);
+                return;
+            }
+            
+            // 2. 保存订单信息到localStorage，以便返回时使用
+            localStorage.setItem('creditCardBindOrderId', currentBindOrderId);
+            localStorage.setItem('creditCardPaymentChannel', selectedPaymentChannel);
+            localStorage.setItem('creditCardOrderInfo', JSON.stringify(orderInfo));
+            
+            // 3. 直接跳转到绑卡页面
+            window.location.href = bindResult.payUrl;
+        }
+        
+        // 创建绑卡请求
+        async function createBindCardRequest() {
+            const timestamp = Date.now();
+            currentBindOrderId = 'GP' + timestamp;
+            
+            const payload = {
+                orderId: timestamp,
+                orderSn: currentBindOrderId,
+                totalAmount: orderInfo.totalAmount,
+                paymentChannel: 'CREDIT_CARD',
+                subject: orderInfo.subject + ' - 信用卡绑定'
+            };
+            
+            try {
+                const response = await fetch('/portal/payment/globePay/creditCard', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (!response.ok) {
+                    return { success: false, error: `HTTP错误: ${response.status} ${response.statusText}` };
+                }
+                
+                const result = await response.json();
+                
+                if (result.code === 200 && result.data && result.data.return_code === 'SUCCESS') {
+                    return { 
+                        success: true, 
+                        payUrl: result.data.pay_url,
+                        orderId: currentBindOrderId 
+                    };
+                } else {
+                    const errorMsg = result.data ? (result.data.return_msg || result.data.returnMsg) : result.message;
+                    return { success: false, error: errorMsg };
+                }
+            } catch (error) {
+                return { success: false, error: error.message };
+            }
+        }
+        
+        // 检查是否从绑卡页面返回
+        function checkIfReturnFromBindCard() {
+            const savedBindOrderId = localStorage.getItem('creditCardBindOrderId');
+            const savedPaymentChannel = localStorage.getItem('creditCardPaymentChannel');
+            const savedOrderInfo = localStorage.getItem('creditCardOrderInfo');
+            
+            if (savedBindOrderId && savedPaymentChannel === 'CREDIT_CARD') {
+                // 恢复状态
+                currentBindOrderId = savedBindOrderId;
+                selectedPaymentChannel = savedPaymentChannel;
+                if (savedOrderInfo) {
+                    Object.assign(orderInfo, JSON.parse(savedOrderInfo));
+                }
+                
+                // 自动选择信用卡支付方式
+                document.querySelectorAll('.payment-method').forEach(el => el.classList.remove('selected'));
+                document.querySelector('[onclick*="CREDIT_CARD"]').classList.add('selected');
+                document.getElementById('credit-card-info').style.display = 'block';
+                
+                // 显示状态并开始轮询
+                document.getElementById('credit-card-status').style.display = 'block';
+                updatePaymentStatus('🔍 检测到您已完成信用卡绑定，正在查询结果...', 'info');
+                
+                // 开始轮询绑卡结果
+                pollingAttempts = 0;
+                startBindCardPolling();
+            }
+        }
+        
+        // 开始绑卡轮询（指数退避策略）
+        function startBindCardPolling() {
+            pollingAttempts = 0;
+            scheduleNextPoll();
+        }
+        
+        // 调度下一次轮询
+        function scheduleNextPoll() {
+            if (pollingAttempts >= maxPollingAttempts) {
+                updatePaymentStatus(`⏰ 绑卡等待超时，请手动刷新页面重试`, 'warning');
+                return;
+            }
+            
+            const delay = Math.pow(2, pollingAttempts) * 1000; // 1s, 2s, 4s, 8s, 16s, 32s
+            pollingAttempts++;
+            
+            updateCountdown(delay);
+            
+            bindCardPollingInterval = setTimeout(() => {
+                pollBindCardResult();
+            }, delay);
+        }
+        
+        // 轮询绑卡结果
+        async function pollBindCardResult() {
+            try {
+                updatePaymentStatus(`🔍 正在查询绑卡结果... (第${pollingAttempts}次)`, 'info');
+                
+                const response = await fetch(`/portal/payment/globePay/queryBindCard/${currentBindOrderId}`, {
+                    method: 'GET'
+                });
+                
+                const result = await response.json();
+                
+                if (result.code === 200 && result.data && result.data.return_code === 'SUCCESS' && result.data.result_code === 'SUCCESS') {
+                    // 绑卡成功，提取Token
+                    const data = result.data;
+                    const tokenMatch = data.pay_url && data.pay_url.match(/member_token:(.+)/);
+                    if (tokenMatch) {
+                        currentMemberToken = tokenMatch[1];
+                        updatePaymentStatus(`✅ 信用卡绑定成功！\n🔑 Token: ${currentMemberToken}\n💰 正在自动创建支付...`, 'success');
+                        
+                        // 停止轮询并自动创建支付
+                        stopBindCardPolling();
+                        await autoCreateTokenPayment();
+                        return;
+                    }
+                }
+                
+                if (result.data && result.data.result_code === 'NO_BIND') {
+                    // 用户还未完成绑卡，继续轮询
+                    scheduleNextPoll();
+                } else {
+                    // 其他错误
+                    const errorMsg = result.data ? (result.data.return_msg || result.data.returnMsg) : result.message;
+                    updatePaymentStatus(`❌ 查询绑卡失败: ${errorMsg}`, 'error');
+                    stopBindCardPolling();
+                }
+            } catch (error) {
+                updatePaymentStatus(`❌ 查询请求失败: ${error.message}`, 'error');
+                stopBindCardPolling();
+            }
+        }
+        
+        // 自动创建Token支付
+        async function autoCreateTokenPayment() {
+            if (!currentMemberToken) {
+                updatePaymentStatus(`❌ Token获取失败，无法创建支付`, 'error');
+                return;
+            }
+            
+            tokenPayOrderId = 'PAY' + Date.now();
+            const orderIdNumber = parseInt(tokenPayOrderId.replace('PAY', ''));
+            
+            try {
+                updatePaymentStatus(`� 正在使用Token创建支付订单...`, 'info');
+                
+                const response = await fetch(`/portal/payment/globePay/tokenPay/${tokenPayOrderId}/${currentMemberToken}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        orderId: orderIdNumber,
+                        orderSn: tokenPayOrderId,
+                        totalAmount: orderInfo.totalAmount,
+                        paymentChannel: 'CREDIT_CARD',
+                        subject: orderInfo.subject
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.code === 200 && result.data && result.data.return_code === 'SUCCESS') {
+                    const data = result.data;
+                    updatePaymentStatus(`🎉 信用卡支付成功！\n📝 支付订单号: ${tokenPayOrderId}\n🏦 商户订单ID: ${data.partner_order_id || data.order_id}\n💰 支付金额: ¥${orderInfo.totalAmount}`, 'success');
+                    
+                    // 显示成功提示
+                    setTimeout(() => {
+                        alert('🎉 信用卡支付成功完成！\n订单号：' + tokenPayOrderId);
+                    }, 1000);
+                } else {
+                    const errorMsg = result.data ? (result.data.return_msg || result.data.returnMsg) : result.message;
+                    updatePaymentStatus(`❌ Token支付失败: ${errorMsg}`, 'error');
+                    alert('❌ 支付失败：' + errorMsg);
+                }
+            } catch (error) {
+                updatePaymentStatus(`❌ 支付请求失败: ${error.message}`, 'error');
+                alert('❌ 支付请求失败：' + error.message);
+            }
+        }
+        
+        // 停止绑卡轮询
+        function stopBindCardPolling() {
+            if (bindCardPollingInterval) {
+                clearTimeout(bindCardPollingInterval);
+                bindCardPollingInterval = null;
+            }
+        }
+        
+        // 更新支付状态显示
+        function updatePaymentStatus(message, type) {
+            const element = document.getElementById('payment-status-info');
+            element.innerHTML = message.replace(/\n/g, '<br>');
+            element.style.color = type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : type === 'warning' ? '#ffc107' : '#17a2b8';
+            element.style.fontWeight = type === 'success' ? 'bold' : 'normal';
+        }
+        
+        // 更新倒计时显示
+        function updateCountdown(totalMs) {
+            const countdownElement = document.getElementById('countdown-info');
+            let remainingMs = totalMs;
+            
+            const countdownInterval = setInterval(() => {
+                if (remainingMs <= 0) {
+                    clearInterval(countdownInterval);
+                    countdownElement.innerHTML = '';
+                    return;
+                }
+                
+                const seconds = Math.ceil(remainingMs / 1000);
+                countdownElement.innerHTML = `⏱️ 下次查询倒计时: ${seconds}秒`;
+                remainingMs -= 100;
+            }, 100);
+        }
+        
+        // 开始绑卡轮询（指数退避策略）
+        function startBindCardPolling() {
+            scheduleNextPoll();
+        }
+        
+        // 调度下一次轮询
+        function scheduleNextPoll() {
+            if (pollingAttempts >= maxPollingAttempts) {
+                updatePaymentStatus(`⏰ 绑卡查询超时，请刷新页面重试`, 'warning');
+                clearLocalStorage();
+                return;
+            }
+            
+            const delay = Math.pow(2, pollingAttempts) * 1000; // 1s, 2s, 4s, 8s, 16s, 32s
+            pollingAttempts++;
+            
+            updateCountdown(delay);
+            
+            bindCardPollingInterval = setTimeout(() => {
+                pollBindCardResult();
+            }, delay);
+        }
+        
+        // 轮询绑卡结果
+        async function pollBindCardResult() {
+            try {
+                updatePaymentStatus(`🔍 正在查询绑卡结果... (第${pollingAttempts}次)`, 'info');
+                
+                const response = await fetch(`/portal/payment/globePay/queryBindCard/${currentBindOrderId}`, {
+                    method: 'GET'
+                });
+                
+                const result = await response.json();
+                
+                if (result.code === 200 && result.data && result.data.return_code === 'SUCCESS' && result.data.result_code === 'SUCCESS') {
+                    // 绑卡成功，提取Token
+                    const data = result.data;
+                    const tokenMatch = data.pay_url && data.pay_url.match(/member_token:(.+)/);
+                    if (tokenMatch) {
+                        currentMemberToken = tokenMatch[1];
+                        updatePaymentStatus(`✅ 信用卡绑定成功！\n🔑 Token: ${currentMemberToken}\n💰 正在自动创建支付...`, 'success');
+                        
+                        // 停止轮询并自动创建支付
+                        stopBindCardPolling();
+                        await autoCreateTokenPayment();
+                        return;
+                    }
+                }
+                
+                if (result.data && result.data.result_code === 'NO_BIND') {
+                    // 用户还未完成绑卡，继续轮询
+                    scheduleNextPoll();
+                } else {
+                    // 其他错误
+                    const errorMsg = result.data ? (result.data.return_msg || result.data.returnMsg) : result.message;
+                    updatePaymentStatus(`❌ 查询绑卡失败: ${errorMsg}`, 'error');
+                    stopBindCardPolling();
+                    clearLocalStorage();
+                }
+            } catch (error) {
+                updatePaymentStatus(`❌ 查询请求失败: ${error.message}`, 'error');
+                stopBindCardPolling();
+                clearLocalStorage();
+            }
+        }
+        
+        // 自动创建Token支付
+        async function autoCreateTokenPayment() {
+            if (!currentMemberToken) {
+                updatePaymentStatus(`❌ Token获取失败，无法创建支付`, 'error');
+                clearLocalStorage();
+                return;
+            }
+            
+            tokenPayOrderId = 'PAY' + Date.now();
+            const orderIdNumber = parseInt(tokenPayOrderId.replace('PAY', ''));
+            
+            try {
+                updatePaymentStatus(`💳 正在使用Token创建支付订单...`, 'info');
+                
+                const response = await fetch(`/portal/payment/globePay/tokenPay/${tokenPayOrderId}/${currentMemberToken}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        orderId: orderIdNumber,
+                        orderSn: tokenPayOrderId,
+                        totalAmount: orderInfo.totalAmount,
+                        paymentChannel: 'CREDIT_CARD',
+                        subject: orderInfo.subject
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.code === 200 && result.data && result.data.return_code === 'SUCCESS') {
+                    const data = result.data;
+                    updatePaymentStatus(`🎉 信用卡支付成功！\n📝 支付订单号: ${tokenPayOrderId}\n🏦 商户订单ID: ${data.partner_order_id || data.order_id}\n💰 支付金额: ¥${orderInfo.totalAmount}`, 'success');
+                    
+                    // 清除本地存储
+                    clearLocalStorage();
+                    
+                    // 显示成功提示
+                    setTimeout(() => {
+                        alert('🎉 信用卡支付成功完成！\n订单号：' + tokenPayOrderId);
+                    }, 1000);
+                } else {
+                    const errorMsg = result.data ? (result.data.return_msg || result.data.returnMsg) : result.message;
+                    updatePaymentStatus(`❌ Token支付失败: ${errorMsg}`, 'error');
+                    clearLocalStorage();
+                    alert('❌ 支付失败：' + errorMsg);
+                }
+            } catch (error) {
+                updatePaymentStatus(`❌ 支付请求失败: ${error.message}`, 'error');
+                clearLocalStorage();
+                alert('❌ 支付请求失败：' + error.message);
+            }
+        }
+        
+        // 停止绑卡轮询
+        function stopBindCardPolling() {
+            if (bindCardPollingInterval) {
+                clearTimeout(bindCardPollingInterval);
+                bindCardPollingInterval = null;
+            }
+        }
+        
+        // 清除本地存储
+        function clearLocalStorage() {
+            localStorage.removeItem('creditCardBindOrderId');
+            localStorage.removeItem('creditCardPaymentChannel');
+            localStorage.removeItem('creditCardOrderInfo');
+        }
+    </script>
+</body>
+</html>

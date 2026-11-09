@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.macro.mall.dao.refund.RefundRequestDao">
+    
+    <resultMap id="BaseResultMap" type="com.macro.mall.domain.refund.RefundRequest">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="refund_sn" property="refundSn" jdbcType="VARCHAR"/>
+        <result column="order_id" property="orderId" jdbcType="BIGINT"/>
+        <result column="order_sn" property="orderSn" jdbcType="VARCHAR"/>
+        <result column="payment_record_id" property="paymentRecordId" jdbcType="BIGINT"/>
+        <result column="member_id" property="memberId" jdbcType="BIGINT"/>
+        <result column="member_username" property="memberUsername" jdbcType="VARCHAR"/>
+        <result column="refund_amount" property="refundAmount" jdbcType="DECIMAL"/>
+        <result column="refund_reason" property="refundReason" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="VARCHAR"/>
+        <result column="apply_time" property="applyTime" jdbcType="TIMESTAMP"/>
+        <result column="audit_time" property="auditTime" jdbcType="TIMESTAMP"/>
+        <result column="auditor_id" property="auditorId" jdbcType="BIGINT"/>
+        <result column="auditor_name" property="auditorName" jdbcType="VARCHAR"/>
+        <result column="audit_note" property="auditNote" jdbcType="VARCHAR"/>
+        <result column="third_party_refund_id" property="thirdPartyRefundId" jdbcType="VARCHAR"/>
+        <result column="refund_time" property="refundTime" jdbcType="TIMESTAMP"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, refund_sn, order_id, order_sn, payment_record_id, member_id, member_username,
+        refund_amount, refund_reason, status, apply_time, audit_time, auditor_id, auditor_name,
+        audit_note, third_party_refund_id, refund_time, create_time, update_time
+    </sql>
+
+    <!-- 插入退款申请 -->
+    <insert id="insert" parameterType="com.macro.mall.domain.refund.RefundRequest" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO refund_request (
+            refund_sn, order_id, order_sn, payment_record_id, member_id, member_username,
+            refund_amount, refund_reason, status, apply_time, create_time, update_time
+        ) VALUES (
+            #{refundSn}, #{orderId}, #{orderSn}, #{paymentRecordId}, #{memberId}, #{memberUsername},
+            #{refundAmount}, #{refundReason}, #{status}, #{applyTime}, #{createTime}, #{updateTime}
+        )
+    </insert>
+
+    <!-- 根据ID查询 -->
+    <select id="selectById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM refund_request
+        WHERE id = #{id}
+    </select>
+
+    <!-- 根据退款单号查询 -->
+    <select id="selectByRefundSn" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM refund_request
+        WHERE refund_sn = #{refundSn}
+    </select>
+
+    <!-- 根据订单ID查询 -->
+    <select id="selectByOrderId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM refund_request
+        WHERE order_id = #{orderId}
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 根据订单号查询退款申请列表 -->
+    <select id="selectByOrderSn" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM refund_request
+        WHERE order_sn = #{orderSn}
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 根据会员ID查询退款申请列表 -->
+    <select id="selectByMemberId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM refund_request
+        <where>
+            member_id = #{memberId}
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+        <if test="offset != null and limit != null">
+            LIMIT #{limit} OFFSET #{offset}
+        </if>
+    </select>
+
+    <!-- 管理员查询退款申请列表 -->
+    <select id="selectForAdmin" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM refund_request
+        <where>
+            <if test="status != null and status != ''">
+                status = #{status}
+            </if>
+            <if test="refundSn != null and refundSn != ''">
+                AND refund_sn LIKE CONCAT('%', #{refundSn}, '%')
+            </if>
+            <if test="orderSn != null and orderSn != ''">
+                AND order_sn LIKE CONCAT('%', #{orderSn}, '%')
+            </if>
+            <if test="orderId != null">
+                AND order_id = #{orderId}
+            </if>
+            <if test="memberUsername != null and memberUsername != ''">
+                AND member_username LIKE CONCAT('%', #{memberUsername}, '%')
+            </if>
+            <if test="startDate != null">
+                AND apply_time >= #{startDate}
+            </if>
+            <if test="endDate != null">
+                AND apply_time &lt;= #{endDate}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+        <if test="offset != null and limit != null">
+            LIMIT #{limit} OFFSET #{offset}
+        </if>
+    </select>
+
+    <!-- 统计会员退款申请数量 -->
+    <select id="countByMemberId" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM refund_request
+        <where>
+            member_id = #{memberId}
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <!-- 统计管理员退款申请数量 -->
+    <select id="countForAdmin" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM refund_request
+        <where>
+            <if test="status != null and status != ''">
+                status = #{status}
+            </if>
+            <if test="refundSn != null and refundSn != ''">
+                AND refund_sn LIKE CONCAT('%', #{refundSn}, '%')
+            </if>
+            <if test="orderSn != null and orderSn != ''">
+                AND order_sn LIKE CONCAT('%', #{orderSn}, '%')
+            </if>
+            <if test="orderId != null">
+                AND order_id = #{orderId}
+            </if>
+            <if test="memberUsername != null and memberUsername != ''">
+                AND member_username LIKE CONCAT('%', #{memberUsername}, '%')
+            </if>
+            <if test="startDate != null">
+                AND apply_time >= #{startDate}
+            </if>
+            <if test="endDate != null">
+                AND apply_time &lt;= #{endDate}
+            </if>
+        </where>
+    </select>
+
+    <!-- 更新退款申请 -->
+    <update id="updateById" parameterType="com.macro.mall.domain.refund.RefundRequest">
+        UPDATE refund_request
+        SET
+            status = #{status},
+            audit_time = #{auditTime},
+            auditor_id = #{auditorId},
+            auditor_name = #{auditorName},
+            audit_note = #{auditNote},
+            third_party_refund_id = #{thirdPartyRefundId},
+            refund_time = #{refundTime},
+            update_time = #{updateTime}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 更新退款状态 -->
+    <update id="updateStatus">
+        UPDATE refund_request
+        SET
+            status = #{status},
+            <if test="thirdPartyRefundId != null">
+                third_party_refund_id = #{thirdPartyRefundId},
+            </if>
+            <if test="failureReason != null">
+                audit_note = #{failureReason},
+            </if>
+            <if test="status == 'SUCCESS'">
+                refund_time = NOW(),
+            </if>
+            update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 更新审核信息 -->
+    <update id="updateAuditInfo">
+        UPDATE refund_request
+        SET
+            status = #{status},
+            audit_time = NOW(),
+            auditor_id = #{auditorId},
+            auditor_name = #{auditorName},
+            <if test="auditNote != null">
+                audit_note = #{auditNote},
+            </if>
+            update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 查询待处理的退款申请 -->
+    <select id="selectPendingRefunds" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM refund_request
+        WHERE status = #{status}
+        ORDER BY create_time ASC
+        LIMIT #{limit}
+    </select>
+
+    <!-- 根据ID列表批量查询 -->
+    <select id="selectByIds" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM refund_request
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 查询超时的退款申请 - 这是关键的缺失方法 -->
+    <select id="selectTimeoutRefunds" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM refund_request
+        WHERE status = #{status}
+        AND third_party_refund_id IS NOT NULL
+        AND update_time &lt; NOW() - (#{timeoutHours} * INTERVAL '1 hour')
+        ORDER BY update_time ASC
+        LIMIT #{limit}
+    </select>
+
+    <!-- 根据第三方退款单号查询 -->
+    <select id="selectByThirdPartyRefundId" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM refund_request
+        WHERE third_party_refund_id = #{thirdPartyRefundId}
+    </select>
+
+    <!-- 批量更新退款状态 -->
+    <update id="batchUpdateStatus">
+        UPDATE refund_request
+        SET status = #{status}, update_time = NOW()
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!-- 根据支付流水号查询退款记录 -->
+    <select id="selectByPaymentTransactionId" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM refund_request
+        WHERE order_sn = #{paymentTransactionId}
+        ORDER BY create_time DESC
+    </select>
+
+</mapper>

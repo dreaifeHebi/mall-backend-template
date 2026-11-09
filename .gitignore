@@ -1,0 +1,36 @@
+# local configuration files #
+.sdkmanrc
+.env
+.env.local
+*.local
+
+# Maven #
+target/
+
+# IDEA #
+.idea/
+*.iml
+
+# Eclipse #
+.settings/
+.classpath
+.project
+
+# VS Code #
+.vscode/
+
+# local file uploads #
+**/uploads/
+
+# log files #
+**/*.log
+**/**/logs/
+
+# package files #
+*.war
+*.jar
+*.zip
+*.tar.gz
+mall-lightsail-deploy/
+**/mall-admin.jar
+**/mall-portal.jar

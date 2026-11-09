@@ -1,0 +1,111 @@
+server:
+  port: 8085
+
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres:5432/mall}
+    username: ${SPRING_DATASOURCE_USERNAME:mall}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
+    druid:
+      initial-size: 5 #连接池初始化大小
+      min-idle: 10 #最小空闲连接数
+      max-active: 20 #最大连接数
+      web-stat-filter:
+        exclusions: "*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*" #不统计这些请求数据
+      stat-view-servlet: #访问监控网页的登录用户名和密码
+        login-username: ${DRUID_LOGIN_USERNAME:druid}
+        login-password: ${DRUID_LOGIN_PASSWORD:}
+  redis:
+    host: redis # Redis服务器地址
+    database: 0 # Redis数据库索引（默认为0）
+    port: 6379 # Redis服务器连接端口
+    password: ${SPRING_REDIS_PASSWORD:} # Redis服务器连接密码（默认为空）
+    timeout: 300ms # 连接超时时间（毫秒）
+
+  mail:
+    host: email-smtp.us-west-1.amazonaws.com   # AWS SES SMTP 终端节点
+    port: 587
+    username: ${SES_SMTP_USERNAME}             # 从 SES 获取的 SMTP 用户名
+    password: ${SES_SMTP_PASSWORD}             # 从 SES 获取的 SMTP 密码
+    protocol: smtp
+    default-encoding: UTF-8
+    from: ${SPRING_MAIL_FROM:mall@example.com}         # 发送邮箱地址
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 3000
+          writetimeout: 5000
+logging:
+  file:
+    path: /var/logs
+  level:
+    root: info
+    com.macro.mall: info
+
+mall:
+  upload:
+    path: ${MALL_UPLOAD_PATH:/tmp/mall/uploads} # 文件上传路径
+    url: ${MALL_UPLOAD_URL:/uploads} # 文件访问路径
+  domain: ${MALL_DOMAIN:http://localhost:8085} # 访问域名
+  frontend:
+    base-url: ${FRONTEND_BASE_URL:http://localhost:8060} # 前端地址
+  email:
+    enable: true # 是否启用邮件发送
+    mode: prod
+  admin:
+    base-url: ${MALL_ADMIN_BASE_URL:http://localhost:8080} # Admin后台地址
+
+alipay:
+  gatewayUrl: https://openapi-sandbox.dl.alipaydev.com/gateway.do
+  appId: your appId
+  alipayPublicKey: your alipayPublicKey
+  appPrivateKey: your appPrivateKey
+  returnUrl: ${ALIPAY_RETURN_URL:http://localhost:8060/payment/success}
+  notifyUrl:
+
+# GlobePay支付配置 - Docker生产环境
+globepay:
+  base-url: https://pay.globepay.co.jp
+  partner-code: ${GLOBEPAY_PARTNER_CODE:}
+  credential-code: ${GLOBEPAY_CREDENTIAL_CODE:}
+  # 使用Nginx代理的URL
+  notify-url: ${GLOBEPAY_NOTIFY_URL:http://localhost/portal/payment/h5/notify/globepay}
+  redirect-url: ${GLOBEPAY_REDIRECT_URL:http://localhost/portal/payment/success.html}
+  credit-card-redirect-url: ${GLOBEPAY_CREDIT_CARD_REDIRECT_URL:http://localhost/portal/payment/credit-card-success.html}
+  default-currency: ${GLOBEPAY_DEFAULT_CURRENCY:JPY}
+  sign-valid-minutes: 5
+
+secure:
+  ignored:
+    urls:
+      - /swagger-ui/**
+      - /swagger-resources/**
+      - /v2/api-docs/**
+      - /v3/api-docs/**
+      - /webjars/**
+      - /doc.html
+      - /favicon.ico
+      - /sso/login
+      - /sso/register
+      - /sso/register/json
+      - /sso/resetPassword
+      - /sso/resetPassword/confirm
+      - /sso/email/confirm
+      - /confirm-email
+      - /sso/getAuthCode
+      - /member/register
+      - /member/login
+      - /member/getAuthCode
+      - /home/**
+      - /product/**
+      - /brand/**
+      - /productCategory/**
+      - /payment/h5/admin/confirm
+      - /static/**
+      - /actuator/**
